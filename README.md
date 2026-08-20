@@ -17,8 +17,9 @@ data/
   historico_depositos.csv      Histórico completo, versionado en git (fuente de verdad)
   last_update.json             Metadata de la última corrida (para el dashboard)
   raw/                         Excel crudo descargado (no versionado, se regenera cada corrida)
-dashboard/
+docs/
   index.html / app.js / styles.css   Dashboard estático, sin build step ni dependencias externas
+  data/                         Copia publicable de los datos (para GitHub Pages "Deploy from a branch")
 .github/workflows/
   update-and-deploy.yml        Cron diario: descarga -> procesa -> commit -> publica en Pages
 ```
@@ -77,26 +78,24 @@ python scripts/fetch_cmf.py --output data/raw/deposito_fondos_mutuos_latest.xlsx
 python scripts/process.py --input data/raw/deposito_fondos_mutuos_latest.xlsx
 ```
 
-Para ver el dashboard con los datos actuales:
+`process.py` deja automáticamente una copia lista para servir en `docs/`, así que para ver
+el dashboard con los datos actuales basta con:
 
 ```bash
-mkdir -p /tmp/site/data
-cp dashboard/* /tmp/site/
-cp data/historico_depositos.csv data/last_update.json /tmp/site/data/
-cd /tmp/site && python3 -m http.server 8000
+cd docs && python3 -m http.server 8000
 # abrir http://localhost:8000
 ```
 
 ## Automatización (GitHub Actions)
 
 `.github/workflows/update-and-deploy.yml` corre diariamente (cron `0 12 * * *`,
-~08-09 hora Chile), además de en cada push a `main` que toque `dashboard/` o
+~08-09 hora Chile), además de en cada push a `main` que toque `docs/` o
 `scripts/`, y manualmente vía "Run workflow". En cada corrida:
 
 1. Descarga el Excel desde la CMF (`fetch_cmf.py`).
-2. Lo normaliza e integra al histórico (`process.py`).
-3. Commitea el CSV/JSON actualizados directamente a la rama.
-4. Publica `dashboard/` + los datos frescos en GitHub Pages.
+2. Lo normaliza e integra al histórico (`process.py`, que además deja una copia en `docs/data/`).
+3. Commitea el CSV/JSON actualizados (tanto `data/` como `docs/data/`) directamente a la rama.
+4. Publica `docs/` en GitHub Pages.
 
 ### Paso manual único requerido (solo la primera vez)
 
@@ -118,13 +117,15 @@ revisión; si persiste, hay que escribirle a soporte de GitHub.
 **Mientras tanto, el dashboard igual está publicado**, usando el modo clásico de Pages
 que no depende de Actions:
 
-**Settings → Pages → Source: "Deploy from a branch" → Branch: `main` → Folder: `/dashboard`**
+**Settings → Pages → Source: "Deploy from a branch" → Branch: `main` → Folder: `/docs`**
 
-`scripts/process.py` ya deja una copia de `historico_depositos.csv` y `last_update.json`
-dentro de `dashboard/data/` en cada corrida (parámetro `--publish-dir`, activado por
-defecto) para que este modo funcione sin pasos extra. La única desventaja: la
-actualización diaria automática no corre hasta que Actions quede habilitado — mientras
-tanto, se actualiza corriendo el pipeline localmente y haciendo push.
+(Nota: GitHub solo permite `/` o `/docs` como carpeta en este modo clásico — por eso el
+dashboard vive en `docs/` y no en `dashboard/`.) `scripts/process.py` ya deja una copia de
+`historico_depositos.csv` y `last_update.json` dentro de `docs/data/` en cada corrida
+(parámetro `--publish-dir`, activado por defecto) para que este modo funcione sin pasos
+extra. La única desventaja: la actualización diaria automática no corre hasta que Actions
+quede habilitado — mientras tanto, se actualiza corriendo el pipeline localmente y
+haciendo push.
 
 Una vez que GitHub habilite Actions para la cuenta, cambia el Source de Pages de vuelta a
 **"GitHub Actions"** y el workflow `update-and-deploy.yml` retoma la actualización diaria

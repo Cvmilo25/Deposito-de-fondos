@@ -55,7 +55,7 @@ def main():
     )
     parser.add_argument(
         "--publish-dir",
-        default="dashboard/data",
+        default="docs/data",
         help="Carpeta donde se refleja una copia del CSV/JSON para que GitHub Pages "
         "(modo 'Deploy from a branch', sin Actions) la sirva directamente. "
         "Pasa '' para omitir esta copia.",
