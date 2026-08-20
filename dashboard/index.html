@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nuevos Fondos Mutuos — CMF Chile</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Nuevos depósitos de Fondos Mutuos — CMF Chile</h1>
+      <p>Fuente oficial: <a href="https://www.cmfchile.cl/institucional/inc/deposito_fondos_mutuos.php" target="_blank" rel="noopener">Registro Público de Depósito de Reglamentos Internos, CMF</a></p>
+    </div>
+    <div id="last-update">Cargando datos…</div>
+  </header>
+
+  <div class="period-toggle" id="period-toggle" role="group" aria-label="Período">
+    <button type="button" data-days="7">Últimos 7 días</button>
+    <button type="button" data-days="30" class="active">Últimos 30 días</button>
+  </div>
+
+  <section class="kpi-grid">
+    <div class="kpi-tile">
+      <div class="label" id="kpi-period-label">Nuevos fondos depositados</div>
+      <div class="value" id="kpi-nuevos">–</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="label" id="kpi-admin-label">Administradoras involucradas</div>
+      <div class="value" id="kpi-admins">–</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="label">Depositados en los últimos 7 días</div>
+      <div class="value" id="kpi-7d">–</div>
+      <div class="sub">fijo, no cambia con el filtro de período</div>
+    </div>
+    <div class="kpi-tile">
+      <div class="label">Depositados en los últimos 30 días</div>
+      <div class="value" id="kpi-30d">–</div>
+      <div class="sub">fijo, no cambia con el filtro de período</div>
+    </div>
+  </section>
+
+  <section class="panels">
+    <div class="card">
+      <h2>Nuevos fondos por tipo — período seleccionado</h2>
+      <div id="chart-tipo"></div>
+    </div>
+    <div class="card">
+      <h2>Filtros</h2>
+      <div class="filters">
+        <div>
+          <label for="f-desde">Fecha depósito desde</label>
+          <input type="date" id="f-desde" />
+        </div>
+        <div>
+          <label for="f-hasta">Fecha depósito hasta</label>
+          <input type="date" id="f-hasta" />
+        </div>
+        <div>
+          <label for="f-admin">Administradora</label>
+          <select id="f-admin"><option value="">Todas</option></select>
+        </div>
+        <div>
+          <label for="f-tipo">Tipo de fondo</label>
+          <select id="f-tipo"><option value="">Todos</option></select>
+        </div>
+        <div>
+          <label for="f-run">RUN</label>
+          <input type="text" id="f-run" placeholder="ej. 10917" />
+        </div>
+        <div style="grid-column: 1 / -1;">
+          <label for="f-nombre">Nombre del fondo</label>
+          <input type="text" id="f-nombre" placeholder="Buscar por nombre…" />
+        </div>
+        <div class="clear-btn" style="grid-column: 1 / -1;">
+          <button type="button" class="clear" id="f-clear">Limpiar filtros</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Detalle de depósitos</h2>
+    <div class="table-scroll">
+      <table id="tbl">
+        <thead>
+          <tr>
+            <th data-key="fecha_deposito" data-type="date">Fecha Depósito</th>
+            <th data-key="administradora" data-type="text">Administradora</th>
+            <th data-key="nombre_fondo" data-type="text">Fondo</th>
+            <th data-key="run_fondo" data-type="num">RUN</th>
+            <th data-key="tipo_fondo" data-type="text">Tipo de Fondo</th>
+            <th data-key="_reglamento" data-type="text">Reglamento</th>
+          </tr>
+        </thead>
+        <tbody id="tbl-body"></tbody>
+      </table>
+    </div>
+    <div class="table-footer">
+      <span id="row-count"></span>
+      <span>Se muestran los depósitos que cumplen los filtros de período y de la sección "Filtros" a la vez</span>
+    </div>
+  </section>
+
+  <footer class="site">
+    Datos extraídos del Registro Público de Depósito de Reglamentos Internos de la CMF.
+    El campo "Fecha de Depósito" es la fecha oficial informada por la CMF para cada registro
+    (no confundir con fecha de inicio de operaciones). El histórico completo, con su
+    trazabilidad de actualizaciones, vive en <code>data/historico_depositos.csv</code> en el
+    repositorio del proyecto.
+  </footer>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

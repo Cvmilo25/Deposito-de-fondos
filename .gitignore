@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.DS_Store
+
+# Excel crudo descargado de la CMF: se regenera en cada corrida, no se versiona.
+data/raw/*.xlsx
+data/raw/*.xls
+data/raw/*.download

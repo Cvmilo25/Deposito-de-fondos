@@ -1,0 +1,67 @@
+name: Actualizar datos CMF y publicar dashboard
+
+on:
+  schedule:
+    - cron: "0 12 * * *" # diario, ~08-09 hora Chile según horario de verano
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths:
+      - "dashboard/**"
+      - "scripts/**"
+      - ".github/workflows/update-and-deploy.yml"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          python -m playwright install --with-deps chromium
+
+      - name: Descargar Excel desde la CMF
+        run: python scripts/fetch_cmf.py --output data/raw/deposito_fondos_mutuos_latest.xlsx
+
+      - name: Procesar y actualizar histórico
+        run: python scripts/process.py --input data/raw/deposito_fondos_mutuos_latest.xlsx --history data/historico_depositos.csv
+
+      - name: Commit histórico actualizado
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/historico_depositos.csv data/last_update.json
+          git diff --cached --quiet || git commit -m "chore: actualizar datos CMF $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Ensamblar sitio estático
+        run: |
+          mkdir -p site/data
+          cp dashboard/index.html dashboard/app.js dashboard/styles.css site/
+          cp data/historico_depositos.csv data/last_update.json site/data/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
