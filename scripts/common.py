@@ -102,25 +102,28 @@ def normalize_dataframe(df_raw):
 
 
 def merge_into_history(history_df, new_df, run_date):
-    """Combina new_df (ya normalizado) dentro de history_df por id_registro.
+    """Combina new_df (ya normalizado) dentro de history_df por run_fondo.
 
-    Si un id_registro ya existía, se actualiza con los datos más recientes (la CMF puede
-    modificar el estado o el reglamento vigente de un registro existente) pero conserva su
-    'primera_deteccion' original. Los id_registro nuevos quedan con primera_deteccion=run_date.
+    Se usa 'run_fondo' (RUN del fondo) como clave, no 'id_registro': la CMF reutiliza
+    N° de registro entre fondos distintos en al menos un caso conocido (ej. FM110545
+    aparece para dos fondos con RUN distinto), mientras que el RUN es único por fondo
+    en todo el histórico. Si un run_fondo ya existía, se actualiza con los datos más
+    recientes (la CMF puede modificar el estado o el reglamento vigente de un registro
+    existente) pero conserva su 'primera_deteccion' original.
     """
     new_df = new_df.copy()
     new_df["primera_deteccion"] = run_date
 
-    if history_df is None or history_df.empty:
-        combined = new_df
-    else:
-        previous_first_seen = history_df.set_index("id_registro")["primera_deteccion"].to_dict()
-        combined = pd.concat([history_df, new_df], ignore_index=True)
-        combined = combined.drop_duplicates(subset=["id_registro"], keep="last")
-        combined["primera_deteccion"] = combined.apply(
-            lambda r: previous_first_seen.get(r["id_registro"], r["primera_deteccion"]),
-            axis=1,
-        )
+    if history_df is None:
+        history_df = pd.DataFrame(columns=HISTORY_COLUMNS)
+
+    previous_first_seen = history_df.set_index("run_fondo")["primera_deteccion"].to_dict()
+    combined = pd.concat([history_df, new_df], ignore_index=True)
+    combined = combined.drop_duplicates(subset=["run_fondo"], keep="last")
+    combined["primera_deteccion"] = combined.apply(
+        lambda r: previous_first_seen.get(r["run_fondo"], r["primera_deteccion"]),
+        axis=1,
+    )
 
     combined = combined.sort_values("fecha_deposito", ascending=False).reset_index(drop=True)
     return combined[HISTORY_COLUMNS]

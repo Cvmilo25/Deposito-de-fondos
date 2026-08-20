@@ -8,6 +8,7 @@ Uso:
 """
 import argparse
 import json
+import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -52,6 +53,13 @@ def main():
         help="Fecha (YYYY-MM-DD) a usar como 'primera_deteccion' para registros nuevos. "
         "Por defecto: hoy (UTC).",
     )
+    parser.add_argument(
+        "--publish-dir",
+        default="dashboard/data",
+        help="Carpeta donde se refleja una copia del CSV/JSON para que GitHub Pages "
+        "(modo 'Deploy from a branch', sin Actions) la sirva directamente. "
+        "Pasa '' para omitir esta copia.",
+    )
     args = parser.parse_args()
 
     run_date = args.run_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -92,6 +100,13 @@ def main():
             indent=2,
         )
     )
+
+    if args.publish_dir:
+        publish_dir = Path(args.publish_dir)
+        publish_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy(history_path, publish_dir / history_path.name)
+        shutil.copy(meta_path, publish_dir / meta_path.name)
+        print(f"Copia publicada en {publish_dir}/ (para GitHub Pages sin Actions)")
 
     print(f"Histórico actualizado: {before} -> {after} filas ({nuevos} nuevas)")
 

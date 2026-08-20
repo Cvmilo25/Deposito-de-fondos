@@ -35,7 +35,7 @@ siempre significa los 30 días previos a hoy.
 
 | Columna | Origen en el Excel de la CMF |
 |---|---|
-| `id_registro` | N° de registro (clave única) |
+| `id_registro` | N° de registro (informativo — no siempre es único, ver nota abajo) |
 | `fecha_deposito` | Fecha de depósito |
 | `run_fondo` | RUN del Fondo Mutuo |
 | `nombre_fondo` | Nombre del Fondo Mutuo |
@@ -47,6 +47,14 @@ siempre significa los 30 días previos a hoy.
 | `reglamento_url` | Construida: `https://www.cmfchile.cl/documentos/rfm/rfm_{codigo}.pdf` |
 | `fecha_ultima_modificacion` | Fecha última modificación |
 | `primera_deteccion` | Fecha en que este pipeline detectó el registro por primera vez |
+
+### Sobre la clave única de cada fondo
+
+El histórico se deduplica por `run_fondo` (RUN del fondo), no por `id_registro`. La CMF
+reutiliza el N° de registro entre fondos distintos en al menos un caso confirmado en los
+datos reales (`FM110545` aparece para dos fondos con RUN 8912 y 8756), mientras que el RUN
+es único en las 2.639 filas del histórico inicial. `scripts/process.py` re-detecta esto en
+cada corrida vía `merge_into_history()`.
 
 ### Sobre el link al reglamento interno
 
@@ -97,6 +105,30 @@ GitHub Pages debe activarse una vez en la configuración del repositorio:
 **Settings → Pages → Source: "GitHub Actions"**
 
 Sin este paso el job de deploy fallará aunque el resto del pipeline funcione bien.
+
+### Estado actual: Actions bloqueado por revisión anti-abuso de GitHub
+
+Esta cuenta/repo es nueva y GitHub aún no habilita la ejecución de workflows definidos por
+el usuario (síntoma: `https://github.com/<owner>/<repo>/actions/workflows/update-and-deploy.yml`
+muestra **"This workflow does not exist"** aunque el archivo esté presente y sea válido).
+Esto es una restricción del lado de GitHub, no del código de este proyecto — suele
+levantarse verificando la cuenta (teléfono/email) o esperando a que GitHub complete la
+revisión; si persiste, hay que escribirle a soporte de GitHub.
+
+**Mientras tanto, el dashboard igual está publicado**, usando el modo clásico de Pages
+que no depende de Actions:
+
+**Settings → Pages → Source: "Deploy from a branch" → Branch: `main` → Folder: `/dashboard`**
+
+`scripts/process.py` ya deja una copia de `historico_depositos.csv` y `last_update.json`
+dentro de `dashboard/data/` en cada corrida (parámetro `--publish-dir`, activado por
+defecto) para que este modo funcione sin pasos extra. La única desventaja: la
+actualización diaria automática no corre hasta que Actions quede habilitado — mientras
+tanto, se actualiza corriendo el pipeline localmente y haciendo push.
+
+Una vez que GitHub habilite Actions para la cuenta, cambia el Source de Pages de vuelta a
+**"GitHub Actions"** y el workflow `update-and-deploy.yml` retoma la actualización diaria
+automática (incluyendo el deploy, que sobreescribe lo publicado por el modo clásico).
 
 ## Alcance de datos
 
