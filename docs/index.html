@@ -18,8 +18,9 @@
   </header>
 
   <div class="period-toggle" id="period-toggle" role="group" aria-label="Período">
-    <button type="button" data-days="7">Últimos 7 días</button>
-    <button type="button" data-days="30" class="active">Últimos 30 días</button>
+    <button type="button" data-days="7">Última semana</button>
+    <button type="button" data-days="15">Últimos 15 días</button>
+    <button type="button" data-days="30" class="active">Último mes</button>
   </div>
 
   <section class="kpi-grid">
@@ -52,24 +53,12 @@
       <h2>Filtros</h2>
       <div class="filters">
         <div>
-          <label for="f-desde">Fecha depósito desde</label>
-          <input type="date" id="f-desde" />
-        </div>
-        <div>
-          <label for="f-hasta">Fecha depósito hasta</label>
-          <input type="date" id="f-hasta" />
-        </div>
-        <div>
           <label for="f-admin">Administradora</label>
           <select id="f-admin"><option value="">Todas</option></select>
         </div>
         <div>
           <label for="f-tipo">Tipo de fondo</label>
           <select id="f-tipo"><option value="">Todos</option></select>
-        </div>
-        <div>
-          <label for="f-run">RUN</label>
-          <input type="text" id="f-run" placeholder="ej. 10917" />
         </div>
         <div style="grid-column: 1 / -1;">
           <label for="f-nombre">Nombre del fondo</label>

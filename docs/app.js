@@ -122,19 +122,13 @@ function populateSelect(select, values, currentValue) {
 }
 
 function applyFilters(rows) {
-  const desde = document.getElementById("f-desde").value;
-  const hasta = document.getElementById("f-hasta").value;
   const admin = document.getElementById("f-admin").value;
   const tipo = document.getElementById("f-tipo").value;
-  const run = document.getElementById("f-run").value.trim();
   const nombre = document.getElementById("f-nombre").value.trim().toLowerCase();
 
   return rows.filter((r) => {
-    if (desde && r.fecha_deposito < desde) return false;
-    if (hasta && r.fecha_deposito > hasta) return false;
     if (admin && r.administradora !== admin) return false;
     if (tipo && r.tipo_fondo !== tipo) return false;
-    if (run && !r.run_fondo.includes(run)) return false;
     if (nombre && !r.nombre_fondo.toLowerCase().includes(nombre)) return false;
     return true;
   });
@@ -266,13 +260,13 @@ function wireEvents() {
     render();
   });
 
-  ["f-desde", "f-hasta", "f-admin", "f-tipo", "f-run", "f-nombre"].forEach((id) => {
+  ["f-admin", "f-tipo", "f-nombre"].forEach((id) => {
     document.getElementById(id).addEventListener("input", render);
     document.getElementById(id).addEventListener("change", render);
   });
 
   document.getElementById("f-clear").addEventListener("click", () => {
-    ["f-desde", "f-hasta", "f-admin", "f-tipo", "f-run", "f-nombre"].forEach((id) => {
+    ["f-admin", "f-tipo", "f-nombre"].forEach((id) => {
       document.getElementById(id).value = "";
     });
     render();
