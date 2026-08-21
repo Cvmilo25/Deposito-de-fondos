@@ -21,7 +21,7 @@ docs/
   index.html / app.js / styles.css   Dashboard estático, sin build step ni dependencias externas
   data/                         Copia publicable de los datos (para GitHub Pages "Deploy from a branch")
 .github/workflows/
-  update-and-deploy.yml        Cron diario: descarga -> procesa -> commit -> publica en Pages
+  update-and-deploy.yml        Cron lun-vie 13:00 hora Chile: descarga -> procesa -> commit -> publica en Pages
 ```
 
 ## Cómo se define "nuevo fondo"
@@ -88,9 +88,11 @@ cd docs && python3 -m http.server 8000
 
 ## Automatización (GitHub Actions)
 
-`.github/workflows/update-and-deploy.yml` corre diariamente (cron `0 12 * * *`,
-~08-09 hora Chile), además de en cada push a `main` que toque `docs/` o
-`scripts/`, y manualmente vía "Run workflow". En cada corrida:
+`.github/workflows/update-and-deploy.yml` corre de lunes a viernes a las 13:00
+hora Chile (cron `0 17 * * 1-5`, calculado sobre UTC-4; corre ~1 hora más
+tarde durante el horario de verano — ver comentario en el propio workflow),
+además de en cada push a `main` que toque `docs/` o `scripts/`, y manualmente
+vía "Run workflow". En cada corrida:
 
 1. Descarga el Excel desde la CMF (`fetch_cmf.py`).
 2. Lo normaliza e integra al histórico (`process.py`, que además deja una copia en `docs/data/`).

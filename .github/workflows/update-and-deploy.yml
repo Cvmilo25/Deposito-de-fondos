@@ -2,7 +2,12 @@ name: Actualizar datos CMF y publicar dashboard
 
 on:
   schedule:
-    - cron: "0 12 * * *" # diario, ~08-09 hora Chile según horario de verano
+    # Lunes a viernes 13:00 hora Chile (UTC-4, horario de invierno vigente hoy).
+    # Cron es siempre UTC y Chile cambia de huso con el horario de verano
+    # (UTC-3 aprox. sept-abril), así que en horario de verano esta hora fija
+    # corre a las ~14:00 hora Chile en vez de las 13:00. Ajustar el "17" a
+    # "16" cuando entre el horario de verano si se quiere la hora exacta.
+    - cron: "0 17 * * 1-5"
   workflow_dispatch: {}
   push:
     branches: [main]
