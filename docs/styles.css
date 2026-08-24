@@ -263,14 +263,6 @@ header.top a {
   border-radius: 0 4px 4px 0;
 }
 
-.bar-delta {
-  width: 46px;
-  text-align: right;
-  font-size: 12.5px;
-  font-variant-numeric: tabular-nums;
-  color: var(--text-secondary);
-}
-
 .radar-note {
   color: var(--text-muted);
   font-size: 12px;

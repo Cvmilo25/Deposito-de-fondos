@@ -153,34 +153,28 @@ function inPeriod(rows, days) {
 }
 
 function computeAdminRadar(rows, months) {
-  const currentCutoff = monthsAgo(months);
-  const previousCutoff = monthsAgo(months * 2);
+  const cutoff = monthsAgo(months);
   const byAdmin = new Map();
 
   const entryFor = (admin) => {
     if (!byAdmin.has(admin)) {
       const mix = {};
       TIPO_ORDER.forEach((t) => (mix[t] = 0));
-      byAdmin.set(admin, { administradora: admin, current: 0, previous: 0, mix });
+      byAdmin.set(admin, { administradora: admin, current: 0, mix });
     }
     return byAdmin.get(admin);
   };
 
   rows.forEach((r) => {
     const d = parseISODate(r.fecha_deposito);
-    if (!d) return;
+    if (!d || d < cutoff) return;
     const entry = entryFor(r.administradora);
-    if (d >= currentCutoff) {
-      entry.current += 1;
-      entry.mix[r.tipo_fondo] = (entry.mix[r.tipo_fondo] || 0) + 1;
-    } else if (d >= previousCutoff) {
-      entry.previous += 1;
-    }
+    entry.current += 1;
+    entry.mix[r.tipo_fondo] = (entry.mix[r.tipo_fondo] || 0) + 1;
   });
 
   return [...byAdmin.values()]
-    .filter((e) => e.current > 0 || e.previous > 0)
-    .map((e) => ({ ...e, delta: e.current - e.previous }))
+    .filter((e) => e.current > 0)
     .sort((a, b) => {
       if (b.current !== a.current) return b.current - a.current;
       return a.administradora.localeCompare(b.administradora, "es");
@@ -243,14 +237,10 @@ function buildRadarRow(entry, max) {
     });
   });
 
-  const deltaText =
-    entry.delta > 0 ? `▲ ${entry.delta}` : entry.delta < 0 ? `▼ ${Math.abs(entry.delta)}` : "— 0";
-
   return el("div", { class: "bar-row" }, [
     el("div", { class: "bar-label wide", text: entry.administradora }),
     el("div", { class: "bar-track stacked" }, segs),
     el("div", { class: "bar-value", text: entry.current.toLocaleString("es-CL") }),
-    el("div", { class: "bar-delta", text: deltaText }),
   ]);
 }
 
@@ -275,7 +265,7 @@ function renderRadar(rows) {
   const max = Math.max(1, ...entries.map((e) => e.current));
   entries.forEach((entry) => container.appendChild(buildRadarRow(entry, max)));
 
-  note.textContent = `Top ${entries.length} administradoras por nuevos fondos en los últimos ${state.radarMonths} meses. La flecha compara contra los ${state.radarMonths} meses previos.`;
+  note.textContent = `Top ${entries.length} administradoras por nuevos fondos en los últimos ${state.radarMonths} meses.`;
 }
 
 function renderTable(rows) {
