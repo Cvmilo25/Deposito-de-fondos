@@ -6,3 +6,6 @@ __pycache__/
 data/raw/*.xlsx
 data/raw/*.xls
 data/raw/*.download
+
+# Fondos nuevos de la corrida actual (insumo de send_email.py): transitorio, no se versiona.
+data/nuevos_ultima_corrida.csv

@@ -60,6 +60,13 @@ def main():
         "(modo 'Deploy from a branch', sin Actions) la sirva directamente. "
         "Pasa '' para omitir esta copia.",
     )
+    parser.add_argument(
+        "--new-rows-output",
+        default="data/nuevos_ultima_corrida.csv",
+        help="Ruta donde dejar (siempre, incluso vacío) el CSV con solo los fondos detectados "
+        "por primera vez en esta corrida — insumo de scripts/send_email.py. No se versiona "
+        "en git (es transitorio, se regenera cada corrida). Pasa '' para omitir.",
+    )
     args = parser.parse_args()
 
     run_date = args.run_date or datetime.now(timezone.utc).strftime("%Y-%m-%d")
@@ -107,6 +114,13 @@ def main():
         shutil.copy(history_path, publish_dir / history_path.name)
         shutil.copy(meta_path, publish_dir / meta_path.name)
         print(f"Copia publicada en {publish_dir}/ (para GitHub Pages sin Actions)")
+
+    if args.new_rows_output:
+        new_rows_path = Path(args.new_rows_output)
+        new_rows_path.parent.mkdir(parents=True, exist_ok=True)
+        nuevas_filas = combined[combined["primera_deteccion"] == run_date]
+        nuevas_filas.to_csv(new_rows_path, index=False)
+        print(f"{len(nuevas_filas)} fondo(s) nuevo(s) de esta corrida en {new_rows_path}")
 
     print(f"Histórico actualizado: {before} -> {after} filas ({nuevos} nuevas)")
 

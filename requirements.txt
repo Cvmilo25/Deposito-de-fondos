@@ -3,3 +3,4 @@ openpyxl>=3.1
 requests>=2.31
 beautifulsoup4>=4.12
 playwright>=1.44
+pypdf>=4.0
