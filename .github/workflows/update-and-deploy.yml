@@ -50,12 +50,11 @@ jobs:
         run: python scripts/process.py --input data/raw/deposito_fondos_mutuos_latest.xlsx --history data/historico_depositos.csv
 
       - name: Enviar aviso por correo de fondos nuevos
-        # No debe frenar el resto de la corrida (commit + deploy de Pages) si Gmail falla
+        # No debe frenar el resto de la corrida (commit + deploy de Pages) si Resend falla
         # por algo transitorio: el dato ya está procesado, el aviso es un "plus".
         continue-on-error: true
         env:
-          GMAIL_USER: "ordenes.camilo@gmail.com"
-          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: python scripts/send_email.py --new-rows data/nuevos_ultima_corrida.csv --to ordenes.camilo@gmail.com
 
       - name: Commit histórico actualizado

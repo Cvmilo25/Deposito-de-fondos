@@ -13,7 +13,7 @@ scripts/
   fetch_cmf.py                 Descarga el Excel desde cmfchile.cl (requests + fallback Playwright)
   process.py                   Normaliza el Excel descargado y lo integra al histórico
   reglamento_objetivo.py       Extrae el párrafo "Objetivo del Fondo" desde el PDF del reglamento
-  send_email.py                Envía el correo de aviso de fondos nuevos (Gmail SMTP)
+  send_email.py                Envía el correo de aviso de fondos nuevos (API de Resend)
   validate_reglamento_links.py Valida contra el sitio real qué % de links de reglamento resuelven
 data/
   historico_depositos.csv      Histórico completo, versionado en git (fuente de verdad)
@@ -102,32 +102,38 @@ vía "Run workflow". En cada corrida:
    y, en `data/nuevos_ultima_corrida.csv`, solo los fondos detectados por primera vez en esta
    corrida — ese archivo es transitorio, no se versiona).
 3. Si hay fondos nuevos, envía un correo de aviso (`send_email.py` — ver sección siguiente).
-   Si falla (ej. problema transitorio de Gmail), no frena el resto de la corrida.
+   Si falla (ej. problema transitorio de Resend), no frena el resto de la corrida.
 4. Commitea el CSV/JSON actualizados (tanto `data/` como `docs/data/`) directamente a la rama.
 5. Publica `docs/` en GitHub Pages.
 
 ### Notificaciones por correo de fondos nuevos
 
 Cada vez que la corrida detecta uno o más fondos nuevos, `scripts/send_email.py` envía un
-correo (vía Gmail SMTP) a `ordenes.camilo@gmail.com` con una tarjeta por fondo: administradora,
-nombre del fondo, tipo, y el párrafo de "Objetivo del Fondo" extraído del PDF del reglamento
-interno (`scripts/reglamento_objetivo.py`). La extracción del objetivo es best-effort — busca
-la sección "Objetivo..." en el texto del PDF con un heurístico (probado contra varios formatos
-de reglamento reales); si no logra encontrarla con confianza, el correo se envía igual con un
-link directo al reglamento en su lugar, en vez de arriesgarse a inventar contenido.
+correo (vía la API de [Resend](https://resend.com), plan gratuito) a `ordenes.camilo@gmail.com`
+con una tarjeta por fondo: administradora, nombre del fondo, tipo, y el párrafo de "Objetivo
+del Fondo" extraído del PDF del reglamento interno (`scripts/reglamento_objetivo.py`). La
+extracción del objetivo es best-effort — busca la sección "Objetivo..." en el texto del PDF
+con un heurístico (probado contra varios formatos de reglamento reales); si no logra
+encontrarla con confianza, el correo se envía igual con un link directo al reglamento en su
+lugar, en vez de arriesgarse a inventar contenido.
 
 **Paso manual único requerido**: como el workflow corre sin que nadie esté presente, necesita
 una credencial guardada como GitHub Secret (nunca en el código):
 
-1. Genera una "Contraseña de aplicación" en tu cuenta de Gmail:
-   [myaccount.google.com/apppasswords](https://myaccount.google.com/apppasswords)
-   (requiere tener activada la verificación en dos pasos). Ponle un nombre como
-   "Deposito de Fondos GitHub Actions".
-2. En el repo: **Settings → Secrets and variables → Actions → New repository secret**
-   → Nombre: `GMAIL_APP_PASSWORD` → Valor: la contraseña de 16 caracteres que generaste.
+1. Crea una cuenta gratis en [resend.com](https://resend.com) usando `ordenes.camilo@gmail.com`
+   (el plan gratuito permite ~100 correos/día y 3.000/mes, de sobra para este uso).
+2. En el dashboard de Resend: **API Keys → Create API Key** → copia la key (empieza con `re_`).
+3. En el repo: **Settings → Secrets and variables → Actions → New repository secret**
+   → Nombre: `RESEND_API_KEY` → Valor: la key que copiaste.
 
-No hace falta ningún otro secret: la dirección de envío/destino (`ordenes.camilo@gmail.com`)
-va directo en el workflow porque no es información sensible.
+**Límite del plan gratuito sin dominio propio verificado**: el remitente queda fijo en
+`onboarding@resend.dev` (el sandbox que Resend habilita sin configuración extra) y **solo se
+puede enviar al correo con el que te registraste en Resend**. Como el destinatario es el mismo
+`ordenes.camilo@gmail.com`, esto no es un problema para este caso de uso; si más adelante se
+quiere enviar a otras personas, hay que verificar un dominio propio en Resend.
+
+No hace falta ningún otro secret: la dirección de destino va directo en el workflow porque
+no es información sensible.
 
 Para probar el extractor de objetivo contra un reglamento real de forma aislada:
 
