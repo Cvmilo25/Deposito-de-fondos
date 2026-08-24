@@ -21,9 +21,12 @@ const TIPO_BADGE_CLASS = {
   "Fondo Inversión Rescatable": "fir",
 };
 
+const RADAR_TOP_N = 12;
+
 const state = {
   rows: [],
   periodDays: 30,
+  radarMonths: 6,
   sortKey: "fecha_deposito",
   sortDir: "desc",
 };
@@ -86,6 +89,13 @@ function daysAgo(n) {
   return d;
 }
 
+function monthsAgo(n) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  d.setMonth(d.getMonth() - n);
+  return d;
+}
+
 function parseISODate(s) {
   if (!s) return null;
   const [y, m, d] = s.split("-").map(Number);
@@ -142,6 +152,41 @@ function inPeriod(rows, days) {
   });
 }
 
+function computeAdminRadar(rows, months) {
+  const currentCutoff = monthsAgo(months);
+  const previousCutoff = monthsAgo(months * 2);
+  const byAdmin = new Map();
+
+  const entryFor = (admin) => {
+    if (!byAdmin.has(admin)) {
+      const mix = {};
+      TIPO_ORDER.forEach((t) => (mix[t] = 0));
+      byAdmin.set(admin, { administradora: admin, current: 0, previous: 0, mix });
+    }
+    return byAdmin.get(admin);
+  };
+
+  rows.forEach((r) => {
+    const d = parseISODate(r.fecha_deposito);
+    if (!d) return;
+    const entry = entryFor(r.administradora);
+    if (d >= currentCutoff) {
+      entry.current += 1;
+      entry.mix[r.tipo_fondo] = (entry.mix[r.tipo_fondo] || 0) + 1;
+    } else if (d >= previousCutoff) {
+      entry.previous += 1;
+    }
+  });
+
+  return [...byAdmin.values()]
+    .filter((e) => e.current > 0 || e.previous > 0)
+    .map((e) => ({ ...e, delta: e.current - e.previous }))
+    .sort((a, b) => {
+      if (b.current !== a.current) return b.current - a.current;
+      return a.administradora.localeCompare(b.administradora, "es");
+    });
+}
+
 function renderKPIs(filteredAll, periodRows) {
   document.getElementById("kpi-period-label").textContent =
     `Nuevos fondos depositados — últimos ${state.periodDays} días`;
@@ -186,6 +231,51 @@ function renderChart(periodRows) {
     ]);
     container.appendChild(row);
   });
+}
+
+function buildRadarRow(entry, max) {
+  const segs = TIPO_ORDER.filter((t) => entry.mix[t] > 0).map((t) => {
+    const pct = Math.max(4, Math.round((entry.mix[t] / max) * 100));
+    return el("div", {
+      class: "bar-seg",
+      style: `width:${pct}%; background: var(${TIPO_COLOR_VAR[t]});`,
+      title: `${t}: ${entry.mix[t]}`,
+    });
+  });
+
+  const deltaText =
+    entry.delta > 0 ? `▲ ${entry.delta}` : entry.delta < 0 ? `▼ ${Math.abs(entry.delta)}` : "— 0";
+
+  return el("div", { class: "bar-row" }, [
+    el("div", { class: "bar-label wide", text: entry.administradora }),
+    el("div", { class: "bar-track stacked" }, segs),
+    el("div", { class: "bar-value", text: entry.current.toLocaleString("es-CL") }),
+    el("div", { class: "bar-delta", text: deltaText }),
+  ]);
+}
+
+function renderRadar(rows) {
+  const container = document.getElementById("radar-list");
+  const note = document.getElementById("radar-note");
+  container.innerHTML = "";
+
+  const entries = computeAdminRadar(rows, state.radarMonths).slice(0, RADAR_TOP_N);
+
+  if (!entries.length) {
+    container.appendChild(
+      el("p", {
+        class: "radar-empty",
+        text: "No hay depósitos en la ventana seleccionada.",
+      })
+    );
+    note.textContent = "";
+    return;
+  }
+
+  const max = Math.max(1, ...entries.map((e) => e.current));
+  entries.forEach((entry) => container.appendChild(buildRadarRow(entry, max)));
+
+  note.textContent = `Top ${entries.length} administradoras por nuevos fondos en los últimos ${state.radarMonths} meses. La flecha compara contra los ${state.radarMonths} meses previos.`;
 }
 
 function renderTable(rows) {
@@ -246,6 +336,7 @@ function render() {
   const periodRows = inPeriod(filteredAll, state.periodDays);
   renderKPIs(filteredAll, periodRows);
   renderChart(periodRows);
+  renderRadar(state.rows);
   renderTable(periodRows);
 }
 
@@ -256,6 +347,16 @@ function wireEvents() {
     state.periodDays = Number(btn.dataset.days);
     document
       .querySelectorAll("#period-toggle button")
+      .forEach((b) => b.classList.toggle("active", b === btn));
+    render();
+  });
+
+  document.getElementById("radar-toggle").addEventListener("click", (e) => {
+    const btn = e.target.closest("button[data-months]");
+    if (!btn) return;
+    state.radarMonths = Number(btn.dataset.months);
+    document
+      .querySelectorAll("#radar-toggle button")
       .forEach((b) => b.classList.toggle("active", b === btn));
     render();
   });
