@@ -1,4 +1,4 @@
-"""Envía un correo de aviso (vía la API de Resend) cuando hay fondos nuevos en la corrida.
+"""Envía un correo de aviso (vía Gmail SMTP) cuando hay fondos nuevos en la corrida.
 
 Lee el CSV que deja `process.py --new-rows-output` (por defecto
 data/nuevos_ultima_corrida.csv) con los fondos detectados por primera vez en esta
@@ -9,19 +9,30 @@ Por cada fondo intenta extraer el párrafo de "Objetivo del Fondo" desde su regl
 interno (scripts/reglamento_objetivo.py, best-effort); si no lo logra, el correo
 igual se envía con un link directo al reglamento en su lugar.
 
-Requiere la variable de entorno RESEND_API_KEY (se genera gratis en resend.com y se
-guarda como GitHub Secret, nunca en el repo). Mientras no se verifique un dominio
-propio en Resend, el remitente queda fijo en "onboarding@resend.dev" (el sandbox que
-Resend habilita sin configuración) y solo se puede enviar al correo con el que te
-registraste en Resend — restricción del plan gratuito, no de este script.
+Requiere las variables de entorno:
+  - GMAIL_USER: tu correo Gmail (ej: user@gmail.com)
+  - GMAIL_APP_PASSWORD: App Password de 16 caracteres (generar en Google Account → Security)
 
 Uso:
+    # Un destinatario
     python scripts/send_email.py --new-rows data/nuevos_ultima_corrida.csv --to correo@ejemplo.com
+
+    # Múltiples destinatarios (múltiples flags)
+    python scripts/send_email.py --new-rows data/nuevos_ultima_corrida.csv \
+        --to email1@ejemplo.com --to email2@ejemplo.com
+
+    # Múltiples destinatarios (comma-separated)
+    python scripts/send_email.py --new-rows data/nuevos_ultima_corrida.csv \
+        --to "email1@ejemplo.com,email2@ejemplo.com"
 """
 import argparse
 import html
 import os
+import re
+import smtplib
 import sys
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from pathlib import Path
 
 import pandas as pd
@@ -134,44 +145,112 @@ def build_email(rows_with_objetivo: list[tuple[dict, str | None]], run_date: str
     return subject, html_body, text_body
 
 
-RESEND_API_URL = "https://api.resend.com/emails"
-RESEND_SANDBOX_FROM = "Depósito de Fondos CMF <onboarding@resend.dev>"
+def validate_email(email: str) -> bool:
+    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+    return bool(re.match(pattern, email.strip()))
 
 
-def send_resend(subject: str, html_body: str, text_body: str, api_key: str, from_addr: str, to_addr: str) -> None:
-    resp = requests.post(
-        RESEND_API_URL,
-        headers={"Authorization": f"Bearer {api_key}"},
-        json={
-            "from": from_addr,
-            "to": [to_addr],
-            "subject": subject,
-            "html": html_body,
-            "text": text_body,
-        },
-        timeout=30,
-    )
-    if resp.status_code >= 300:
-        raise RuntimeError(f"Resend respondió HTTP {resp.status_code}: {resp.text}")
+def parse_recipients(to_args: list[str]) -> list[str]:
+    if not to_args:
+        raise ValueError("Se requiere al menos un destinatario (--to)")
+
+    recipients = []
+    for arg in to_args:
+        for email in arg.split(","):
+            email = email.strip()
+            if not email:
+                continue
+            if not validate_email(email):
+                raise ValueError(f"Email inválido: {email}")
+            recipients.append(email)
+
+    seen = set()
+    result = []
+    for email in recipients:
+        if email.lower() not in seen:
+            seen.add(email.lower())
+            result.append(email)
+
+    if not result:
+        raise ValueError("No se encontraron destinatarios válidos")
+
+    return result
+
+
+def send_gmail_smtp(
+    subject: str,
+    html_body: str,
+    text_body: str,
+    gmail_user: str,
+    gmail_app_password: str,
+    from_addr: str,
+    to_addrs: list[str],
+    smtp_host: str = "smtp.gmail.com",
+    smtp_port: int = 587,
+    timeout: int = 30,
+) -> None:
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = subject
+        msg["From"] = from_addr
+        msg["To"] = ", ".join(to_addrs)
+
+        part_text = MIMEText(text_body, "plain", "utf-8")
+        part_html = MIMEText(html_body, "html", "utf-8")
+        msg.attach(part_text)
+        msg.attach(part_html)
+
+        with smtplib.SMTP(smtp_host, smtp_port, timeout=timeout) as server:
+            server.starttls()
+            server.login(gmail_user, gmail_app_password)
+
+            from_email = from_addr.split("<")[-1].strip(">") if "<" in from_addr else gmail_user
+            server.sendmail(from_email, to_addrs, msg.as_string())
+
+    except smtplib.SMTPAuthenticationError as e:
+        raise RuntimeError(
+            f"Error de autenticación Gmail: credenciales inválidas. "
+            f"Verifica GMAIL_USER y GMAIL_APP_PASSWORD. Detalles: {e}"
+        ) from e
+    except smtplib.SMTPException as e:
+        raise RuntimeError(f"Error SMTP: {e}") from e
+    except Exception as e:
+        raise RuntimeError(f"Error enviando email: {e}") from e
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--new-rows", default="data/nuevos_ultima_corrida.csv")
-    parser.add_argument("--to", required=True, help="Correo destinatario")
+    parser.add_argument(
+        "--to",
+        action="append",
+        required=True,
+        help="Correos destinatarios. Puede usarse múltiples veces: --to email1@ex.com --to email2@ex.com "
+        "o comma-separated: --to email1@ex.com,email2@ex.com",
+    )
     parser.add_argument(
         "--from-addr",
-        default=os.environ.get("RESEND_FROM", RESEND_SANDBOX_FROM),
-        help="Remitente. Por defecto el sandbox de Resend (sin dominio propio verificado).",
+        default=os.environ.get("GMAIL_FROM", "Depósito de Fondos CMF <noreply@gmail.com>"),
+        help="Remitente visible. Por defecto: 'Depósito de Fondos CMF <noreply@gmail.com>'",
     )
     args = parser.parse_args()
 
-    resend_api_key = os.environ.get("RESEND_API_KEY")
-    if not resend_api_key:
+    gmail_user = os.environ.get("GMAIL_USER")
+    gmail_app_password = os.environ.get("GMAIL_APP_PASSWORD")
+
+    if not gmail_user or not gmail_app_password:
         print(
-            "[send_email] Falta RESEND_API_KEY en el entorno "
-            "(debe venir como GitHub Secret). No se puede enviar el correo."
+            "[send_email] Faltan variables de entorno:\n"
+            "  GMAIL_USER (ej: user@gmail.com)\n"
+            "  GMAIL_APP_PASSWORD (16 caracteres, sin espacios)\n"
+            "No se puede enviar el correo."
         )
+        return 1
+
+    try:
+        to_addrs = parse_recipients(args.to)
+    except ValueError as e:
+        print(f"[send_email] Error en destinatarios: {e}")
         return 1
 
     new_rows_path = Path(args.new_rows)
@@ -196,12 +275,13 @@ def main():
     subject, html_body, text_body = build_email(rows_with_objetivo, run_date)
 
     try:
-        send_resend(subject, html_body, text_body, resend_api_key, args.from_addr, args.to)
-    except (requests.RequestException, RuntimeError) as exc:
+        send_gmail_smtp(subject, html_body, text_body, gmail_user, gmail_app_password, args.from_addr, to_addrs)
+    except RuntimeError as exc:
         print(f"[send_email] ERROR enviando el correo: {exc}")
         return 1
 
-    print(f"[send_email] Correo enviado a {args.to}: {subject!r}")
+    recipients_str = ", ".join(to_addrs)
+    print(f"[send_email] Correo enviado a [{recipients_str}]: {subject!r}")
     return 0
 
 
