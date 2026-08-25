@@ -31,11 +31,14 @@ MAX_OBJETIVO_CHARS = 900
 # Variantes de encabezado observadas en reglamentos de fondos mutuos y de inversión.
 # Se buscan como línea (o inicio de línea) para evitar falsos positivos dentro de
 # un párrafo que solo menciona la palabra "objetivo" de pasada.
+# "Objeto" es sinónimo legal válido de "Objetivo" en la normativa CMF — algunas
+# administradoras (ej. BancoEstado) redactan la sección como "Objeto del Fondo"
+# en vez de "Objetivo del Fondo"; sin esta variante el heurístico no la encuentra.
 HEADING_RE = re.compile(
     r"""^\s*
     (?:art[íi]culo\s+\d+\s*[:\.\-]?\s*)?      # opcional: "Artículo 5:" antes del título
     (?:\d+\s*[\.\)]\s*)?                       # opcional: "5." o "5)" como numeral de sección
-    objetivo
+    objet(?:ivo|o)
     (?:\s+(?:del|general|principal)?\s*(?:fondo|de\s+inversi[óo]n)?)?
     \s*[:\.\-]?\s*
     (?P<inline>.*)$                            # texto que pueda venir en la misma línea
