@@ -5,9 +5,10 @@ data/nuevos_ultima_corrida.csv) con los fondos detectados por primera vez en est
 corrida. Si está vacío, no envía nada — el correo es un aviso de "hay algo nuevo",
 no un resumen diario incondicional.
 
-Por cada fondo intenta extraer el párrafo de "Objetivo del Fondo" desde su reglamento
-interno (scripts/reglamento_objetivo.py, best-effort); si no lo logra, el correo
-igual se envía con un link directo al reglamento en su lugar.
+Por cada fondo intenta extraer el objetivo y la duración del fondo desde su
+reglamento interno (scripts/reglamento_objetivo.py, best-effort); si no logra
+extraer alguno de los dos, el correo igual se envía con un link directo al
+reglamento en su lugar.
 
 Requiere las variables de entorno:
   - GMAIL_USER: tu correo Gmail (ej: user@gmail.com)
@@ -40,7 +41,7 @@ import requests
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from reglamento_objetivo import fetch_objetivo
+from reglamento_objetivo import fetch_fund_details
 
 TIPO_COLOR = {
     "Fondo Mutuo": "#2563eb",
@@ -56,18 +57,27 @@ def fmt_fecha(s: str) -> str:
         return s or ""
 
 
-def build_fund_block_html(row: dict, objetivo: str | None) -> str:
+def build_fund_block_html(row: dict, objetivo: str | None, duracion: str | None) -> str:
     color = TIPO_COLOR.get(row["tipo_fondo"], "#2563eb")
+    reglamento_link = (
+        f'<a href="{html.escape(row["reglamento_url"])}" target="_blank">Ver reglamento completo (PDF)</a>'
+        if row.get("reglamento_url")
+        else None
+    )
+
     if objetivo:
         objetivo_html = html.escape(objetivo)
-    elif row.get("reglamento_url"):
-        url = html.escape(row["reglamento_url"])
-        objetivo_html = (
-            f'No se pudo extraer el objetivo automáticamente. '
-            f'<a href="{url}" target="_blank">Ver reglamento completo (PDF)</a>.'
-        )
+    elif reglamento_link:
+        objetivo_html = f"No se pudo extraer el objetivo automáticamente. {reglamento_link}."
     else:
         objetivo_html = "No hay reglamento disponible para este fondo."
+
+    if duracion:
+        duracion_html = html.escape(duracion)
+    elif reglamento_link:
+        duracion_html = f"No se pudo extraer la duración automáticamente. {reglamento_link}."
+    else:
+        duracion_html = "No hay reglamento disponible para este fondo."
 
     return f"""
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0"
@@ -109,6 +119,16 @@ def build_fund_block_html(row: dict, objetivo: str | None) -> str:
                 {objetivo_html}
               </td>
             </tr>
+            <tr>
+              <td colspan="2" style="font-size:13px; color:#666; padding-top:12px; padding-bottom:2px;">
+                ¿Cuál es su duración? <span style="color:#999;">(según el reglamento interno)</span>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="2" style="font-size:14px; color:#222; line-height:1.5;">
+                {duracion_html}
+              </td>
+            </tr>
           </table>
         </td>
       </tr>
@@ -116,11 +136,13 @@ def build_fund_block_html(row: dict, objetivo: str | None) -> str:
     """
 
 
-def build_email(rows_with_objetivo: list[tuple[dict, str | None]], run_date: str) -> tuple[str, str, str]:
-    n = len(rows_with_objetivo)
+def build_email(rows_with_details: list[tuple[dict, str | None, str | None]], run_date: str) -> tuple[str, str, str]:
+    n = len(rows_with_details)
     subject = f"Depósito de Fondos CMF: {n} fondo{'s' if n != 1 else ''} nuevo{'s' if n != 1 else ''} ({run_date})"
 
-    blocks = "".join(build_fund_block_html(row, objetivo) for row, objetivo in rows_with_objetivo)
+    blocks = "".join(
+        build_fund_block_html(row, objetivo, duracion) for row, objetivo, duracion in rows_with_details
+    )
     html_body = f"""
     <html><body style="margin:0; padding:20px; background:#f7f7f8;">
       <div style="max-width:640px; margin:0 auto;">
@@ -136,9 +158,10 @@ def build_email(rows_with_objetivo: list[tuple[dict, str | None]], run_date: str
     """
 
     text_lines = [f"{n} fondo(s) nuevo(s) depositado(s) en la CMF ({run_date})", ""]
-    for row, objetivo in rows_with_objetivo:
+    for row, objetivo, duracion in rows_with_details:
         text_lines.append(f"- {row['administradora']} — {row['nombre_fondo']} ({row['tipo_fondo']})")
         text_lines.append(f"  Objetivo: {objetivo or 'no disponible, ver ' + (row.get('reglamento_url') or 'reglamento')}")
+        text_lines.append(f"  Duración: {duracion or 'no disponible, ver ' + (row.get('reglamento_url') or 'reglamento')}")
         text_lines.append("")
     text_body = "\n".join(text_lines)
 
@@ -263,16 +286,16 @@ def main():
         print("[send_email] No hay fondos nuevos en esta corrida. Sin envío.")
         return 0
 
-    print(f"[send_email] {len(df)} fondo(s) nuevo(s): extrayendo objetivo de cada reglamento...")
+    print(f"[send_email] {len(df)} fondo(s) nuevo(s): extrayendo objetivo y duración de cada reglamento...")
     session = requests.Session()
-    rows_with_objetivo = []
+    rows_with_details = []
     for _, row in df.iterrows():
         row_dict = row.to_dict()
-        objetivo = fetch_objetivo(row_dict.get("reglamento_url"), session=session)
-        rows_with_objetivo.append((row_dict, objetivo))
+        objetivo, duracion = fetch_fund_details(row_dict.get("reglamento_url"), session=session)
+        rows_with_details.append((row_dict, objetivo, duracion))
 
-    run_date = rows_with_objetivo[0][0].get("primera_deteccion") or ""
-    subject, html_body, text_body = build_email(rows_with_objetivo, run_date)
+    run_date = rows_with_details[0][0].get("primera_deteccion") or ""
+    subject, html_body, text_body = build_email(rows_with_details, run_date)
 
     try:
         send_gmail_smtp(subject, html_body, text_body, gmail_user, gmail_app_password, args.from_addr, to_addrs)
