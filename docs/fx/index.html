@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pronóstico del dólar — USD/CLP</title>
+<link rel="stylesheet" href="../styles.css" />
+<link rel="stylesheet" href="fx.css" />
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Pronóstico del dólar (USD/CLP) a 1 mes</h1>
+      <p>Dólar observado en 21 días hábiles · 3 modelos + ensamble, evaluados contra el paseo aleatorio ·
+        <a href="../index.html">← Dashboard CMF</a></p>
+    </div>
+    <div id="last-update">Cargando datos…</div>
+  </header>
+
+  <section class="kpi-grid">
+    <div class="kpi-tile">
+      <div class="label">Dólar observado hoy</div>
+      <div class="value" id="kpi-spot">–</div>
+      <div class="sub" id="kpi-spot-date"></div>
+    </div>
+    <div class="kpi-tile">
+      <div class="label">Pronóstico ensamble a 21 días</div>
+      <div class="value" id="kpi-ens">–</div>
+      <div class="sub" id="kpi-ens-sub"></div>
+    </div>
+    <div class="kpi-tile">
+      <div class="label">Rango 80 % (ensamble)</div>
+      <div class="value small" id="kpi-range">–</div>
+      <div class="sub" id="kpi-range95"></div>
+    </div>
+    <div class="kpi-tile">
+      <div class="label">Error vs. paseo aleatorio (5 años)</div>
+      <div class="value" id="kpi-theil">–</div>
+      <div class="sub">Theil-U del ensamble · &lt; 1 = mejor que "mañana igual que hoy"</div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Pronóstico de hoy por modelo</h2>
+    <div class="table-scroll">
+      <table class="fx-table" id="tbl-today">
+        <thead><tr><th>Modelo</th><th class="num">Pronóstico</th><th class="num">Cambio</th>
+          <th class="num">Rango 80 %</th><th class="num">Rango 95 %</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Últimos 5 años: dólar real vs. lo que el modelo pronosticó 21 días antes</h2>
+      <div class="fx-controls">
+        <label for="sel-model">Modelo</label>
+        <select id="sel-model"></select>
+      </div>
+    </div>
+    <div class="legend-tipo">
+      <span><i style="background:var(--text-primary)"></i>Dólar observado real</span>
+      <span><i style="background:var(--series-1)"></i>Pronóstico (hecho 21 días hábiles antes)</span>
+      <span><i class="band"></i>Intervalo 80 %</span>
+    </div>
+    <div id="chart-main" class="chart"></div>
+    <p class="radar-note">Cada punto azul es el valor que el modelo pronosticó para esa fecha usando solo la información
+      disponible 21 días hábiles antes (backtest walk-forward, sin mirar el futuro). El tramo final punteado es
+      el pronóstico vigente.</p>
+  </section>
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Precisión fuera de muestra</h2>
+      <div class="period-toggle" id="win-toggle" role="group" aria-label="Ventana de evaluación">
+        <button type="button" data-win="test_5y" class="active">Últimos 5 años</button>
+        <button type="button" data-win="oos_desde_2016">Desde 2016</button>
+      </div>
+    </div>
+    <div class="table-scroll">
+      <table class="fx-table" id="tbl-metrics">
+        <thead><tr>
+          <th>Modelo</th><th class="num">Theil-U</th><th class="num">RMSE (CLP)</th><th class="num">MAE (CLP)</th>
+          <th class="num">MAPE</th><th class="num">Acierto dirección</th><th class="num">p Clark-West</th>
+          <th class="num">p Pesaran-Timm.</th><th class="num">Cobertura 80 %</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="radar-note" id="metrics-note"></p>
+  </section>
+
+  <section class="panels fx-panels">
+    <div class="card">
+      <h2>¿Cuándo le gana al paseo aleatorio? (RMSE relativo, ventana 12 meses)</h2>
+      <div id="chart-rolling" class="chart short"></div>
+      <p class="radar-note">Bajo la línea de 1 el modelo es más preciso que el paseo aleatorio en los 12 meses previos.
+        Que cruce la línea es normal: la predictibilidad del tipo de cambio es inestable (Rossi, 2013).</p>
+    </div>
+    <div class="card">
+      <h2>Qué está moviendo el pronóstico de hoy</h2>
+      <div class="period-toggle" id="drv-toggle" role="group" aria-label="Modelo">
+        <button type="button" data-m="ridge" class="active">Ridge-ECM</button>
+        <button type="button" data-m="lgbm">LightGBM (SHAP)</button>
+        <button type="button" data-m="tvp">Kalman</button>
+      </div>
+      <div id="drivers"></div>
+      <p class="radar-note">Contribución de cada variable al retorno esperado a 21 días (en puntos porcentuales).
+        Positivo = empuja el dólar al alza.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Sensibilidades cambiantes (modelo de Kalman, variables estandarizadas)</h2>
+    <div id="chart-betas" class="chart short"></div>
+  </section>
+
+  <section class="card">
+    <h2>Registro en vivo de pronósticos emitidos</h2>
+    <div class="table-scroll">
+      <table class="fx-table" id="tbl-log">
+        <thead><tr><th>Emitido</th><th>Para</th><th class="num">Dólar al emitir</th>
+          <th class="num">Pronóstico ensamble</th><th class="num">Real</th><th class="num">Error</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <footer class="site">
+    Modelo con fines informativos, no es recomendación de inversión. Fuentes: dólar observado, TPM e IPC
+    (Banco Central de Chile vía mindicador.cl), cobre, petróleo, DXY, monedas y acciones (Yahoo Finance),
+    VIX, tasas y CPI de EE.UU. (FRED). Metodología completa en el README del repositorio.
+  </footer>
+</div>
+<script src="fx.js"></script>
+</body>
+</html>

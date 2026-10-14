@@ -1,0 +1,68 @@
+name: Pronóstico diario del dólar (USD/CLP)
+
+on:
+  schedule:
+    # Lunes a viernes 23:30 UTC ≈ 19:30 hora Chile en invierno (20:30 en verano): después de
+    # que el Banco Central publica el dólar observado del día hábil siguiente (~18:30).
+    - cron: "30 23 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      retune:
+        description: "Re-estimar hiperparámetros (solo usa datos anteriores a 2016)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths:
+      - "fx/**"
+      - "docs/fx/**"
+      - ".github/workflows/fx-forecast.yml"
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+# Mismo grupo que update-and-deploy.yml: los dos publican docs/ en Pages y commitean a main.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  forecast:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Tests del modelo
+        run: python -m pytest tests/test_fx.py -q
+
+      - name: Descargar datos, backtest y pronóstico de hoy
+        run: python -m fx.run_daily ${{ inputs.retune && '--retune' || '' }}
+
+      - name: Commit resultados
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/fx docs/data/fx
+          git diff --cached --quiet || git commit -m "chore: actualizar pronóstico USD/CLP $(date -u +%Y-%m-%d)"
+          git pull --rebase origin "${GITHUB_REF_NAME}"
+          git push
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+
+      - name: Deploy a GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

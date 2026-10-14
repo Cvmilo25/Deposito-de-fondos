@@ -181,3 +181,91 @@ El registro de la CMF incluye tres tipos de fondo bajo el mismo depósito de
 reglamentos: `Fondo Mutuo`, `Fondo Inversión Rescatable` y
 `Fondo Inversión No Rescatable`. El dashboard los incluye todos, con "Tipo de
 Fondo" como filtro y como dimensión del gráfico de nuevos depósitos por tipo.
+
+---
+
+# Modelo de pronóstico del dólar (USD/CLP) a 1 mes
+
+Módulo independiente (`fx/`) que pronostica el **dólar observado en 21 días hábiles**, se
+corre a diario y publica en `docs/fx/` un backtest de los **últimos 5 años**: lo que cada
+modelo pronosticó para cada fecha (con la información disponible 21 días hábiles antes) frente
+al valor real.
+
+## Punto de partida estadístico
+
+- **Meese & Rogoff (1983)** mostraron que los modelos de fundamentos no le ganan al
+  **paseo aleatorio** ("el dólar en un mes será igual al de hoy"). **Rossi (2013, *Journal of
+  Economic Literature*, "Exchange Rate Predictability")** revisa 30 años de literatura: hay algo de
+  predictibilidad, pero depende del horizonte, del predictor y del período, y la encuentran sobre
+  todo modelos **lineales con pocos parámetros**. Por eso el paseo aleatorio es el benchmark
+  obligatorio y todo se evalúa contra él con tests formales.
+- **Monedas commodity** (Chen, Rogoff & Rossi 2010; Ferraro, Rogoff & Rossi 2015): para Chile,
+  el **cobre**. BCCh DT 640 (Labbé & De Gregorio) documenta la relación cobre–tipo de cambio real.
+- **Factor dólar global y riesgo** (Lustig, Roussanov & Verdelhan 2011; Verdelhan 2018): **DXY**, **VIX**.
+- **Carry / diferencial de tasas, regla de Taylor** (Lustig & Verdelhan 2007; Molodtsova & Papell 2009): TPM vs. Fed.
+- **Momentum y análisis técnico** (Menkhoff et al. 2012; BCCh DT 425, Abarca, Alarcón, Pincheira & Selaive 2007).
+- **Factores comunes entre monedas** (Engel, Mark & West 2015): BRL, MXN, COP.
+- **Combinación de pronósticos** (Stock & Watson 2004): el promedio simple suele ganarle a cada modelo.
+
+Expectativa honesta: a 1 mes una mejora realista es un error 2–8 % menor que el paseo aleatorio
+y un acierto direccional de 55–60 %. El dashboard muestra también los períodos en que pierde.
+
+## Las tres propuestas (+ ensamble)
+
+| Modelo | Archivo | Idea |
+|---|---|---|
+| 1. **Regresión Ridge-ECM** | `fx/models/regression.py` | Regresión lineal con término de corrección de errores (desvío del dólar respecto de su relación de largo plazo con cobre y DXY) + cobre, DXY, VIX, diferencial de tasas, tipo de cambio real y momentum. Ridge encoge hacia el paseo aleatorio. Se reporta además OLS con errores Newey-West. |
+| 2. **Gradient Boosting (LightGBM)** | `fx/models/ml.py` | ~40 variables, captura no linealidades e interacciones. Regularización fuerte (árboles chicos, ≥100 obs. por hoja). Explicación diaria con valores SHAP. Se descartó LSTM: con objetivos a 21 días solapados hay ~220 observaciones independientes, insuficientes para una red. |
+| 3. **Coeficientes variables (Kalman)** | `fx/models/tvp.py` | Regresión cuyos coeficientes evolucionan como paseo aleatorio, estimada con filtro de Kalman: la sensibilidad al cobre, DXY o tasas cambia con el tiempo (Bacchetta & van Wincoop). |
+| **Ensamble** | `fx/backtest.py` | Promedio simple de las tres. Es el pronóstico principal. |
+| Benchmarks | `fx/models/baselines.py` | Paseo aleatorio, paseo aleatorio con drift, AR(5) sobre retornos diarios. |
+
+## Datos (fuentes abiertas, sin credenciales)
+
+| Variable | Fuente |
+|---|---|
+| Dólar observado (objetivo), TPM, IPC Chile | mindicador.cl (datos del Banco Central de Chile) |
+| Cobre, WTI, DXY, BRL, MXN, COP, EEM, S&P 500, USD/CLP spot | Yahoo Finance (`yfinance`) |
+| VIX, UST 2 años, Fed Funds, CPI EE.UU. | FRED (`fredgraph.csv`, sin API key) |
+
+Para no mirar el futuro, el panel se indexa por la fecha del dólar observado (que se fija con
+transacciones del día hábil anterior) y las series de mercado entran con el cierre del día
+anterior. El IPC de Chile se usa desde el día 10 del mes siguiente y el CPI de EE.UU. desde el día 15.
+Las descargas se cachean en `data/fx/raw/`; si una fuente falla, se usa su último dato cacheado.
+
+## Diseño de la evaluación
+
+- Objetivo: `y_t = ln(S_{t+21}/S_t)`; pronóstico de nivel `S_t·exp(ŷ_t)`.
+- **Período de desarrollo** (orígenes < 2016): único período usado para elegir hiperparámetros
+  (`fx/tune.py`, validación cruzada temporal por año 2012–2015) → `data/fx/hyperparams.json`.
+- **Backtest walk-forward desde 2016**: en cada fecha t los modelos se entrenan solo con
+  observaciones cuyo objetivo ya se realizó (purga de 21 días), re-entrenando cada 21 días
+  hábiles (Kalman se actualiza día a día). Intervalos 80 % / 95 % = cuantiles de los errores
+  fuera de muestra ya realizados de los últimos 2 años (conformal empírico).
+- **Métricas** (ventana "últimos 5 años" y "desde 2016"): RMSE, MAE, MAPE, Theil-U (RMSE / RMSE del
+  paseo aleatorio), acierto direccional, **Clark-West** (vs. paseo aleatorio), **Pesaran-Timmermann**
+  (dirección), **Diebold-Mariano** (vs. ensamble), cobertura de intervalos y Theil-U móvil de 12 meses.
+  Todos los tests usan varianza Newey-West de 20 rezagos por el solapamiento de los objetivos.
+
+## Cómo correrlo
+
+```bash
+pip install -r requirements.txt
+python -m fx.run_daily            # descarga + backtest + pronóstico de hoy (≈1 min)
+python -m fx.run_daily --offline  # sin red, con la caché de data/fx/raw
+python -m fx.run_daily --retune   # re-estimar hiperparámetros (solo datos < 2016)
+python -m pytest tests/test_fx.py # tests de no-fuga y de los tests estadísticos
+cd docs && python3 -m http.server 8000   # abrir http://localhost:8000/fx/
+```
+
+Salidas en `data/fx/` (copiadas a `docs/data/fx/`): `backtest_predictions.csv`, `metrics.json`
+(pronóstico de hoy, métricas, drivers, inferencia HAC), `rolling_theil.csv`, `tvp_betas.csv` y
+`forecast_log.csv`, el registro en vivo de cada pronóstico emitido, que nunca se reescribe y sirve
+para auditar el desempeño real del modelo hacia adelante.
+
+`.github/workflows/fx-forecast.yml` lo corre de lunes a viernes a las 23:30 UTC (después de que
+se publica el dólar observado), commitea los resultados y publica Pages. Mientras Actions siga
+bloqueado para esta cuenta (ver arriba), se actualiza corriendo `python -m fx.run_daily` en local
+y haciendo push.
+
+**Advertencia**: es un modelo estadístico con fines informativos, no una recomendación de inversión.
