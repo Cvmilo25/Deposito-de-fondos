@@ -1,0 +1,1221 @@
+<title>The Metro Vocabulary</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Overpass:wght@500;700;800&family=Noto+Sans:wght@400&display=swap">
+<style>
+/* Layout: una línea de metro. Los bloques de 6 palabras son estaciones; el progreso se lee como un recorrido. */
+:root{
+  --bg:#EDF1F0; --surface:#FFFFFF; --surface-2:#F5F8F7; --ink:#13201C; --muted:#56665F; --line:#D4DDDA;
+  --accent:#2747D0; --accent-ink:#FFFFFF; --accent-soft:#E2E8FC; --signal:#F2B705; --signal-ink:#1F1700;
+  --ok:#16773A; --ok-soft:#E0F2E6; --bad:#B53920; --bad-soft:#FBE6E0; --warn:#8F5D00; --warn-soft:#FBF0D6;
+  --lv0:#C5D0CC; --lv1:#A6BEF4; --lv2:#6B8EEE; --lv3:#2747D0; --lv4:#E0A912; --lv5:#16773A;
+  --shadow:0 1px 2px rgb(19 32 28 / .06), 0 8px 24px rgb(19 32 28 / .07);
+  --f-display:"Overpass","Segoe UI",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible","Segoe UI",system-ui,sans-serif;
+  --f-ipa:"Noto Sans","Segoe UI","Lucida Sans Unicode",system-ui,sans-serif;
+  --r:16px; --r-sm:10px;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0E1412; --surface:#161E1B; --surface-2:#1C2622; --ink:#E6EEEA; --muted:#9AABA4; --line:#2A3632;
+  --accent:#7F9CFF; --accent-ink:#0B1230; --accent-soft:#1F2A4D; --signal:#F4C430; --signal-ink:#1F1700;
+  --ok:#4CC57A; --ok-soft:#14301F; --bad:#FF8466; --bad-soft:#3A1C14; --warn:#E9B54D; --warn-soft:#33270F;
+  --lv0:#34403C; --lv1:#3A5296; --lv2:#5578EE; --lv3:#8FA8FF; --lv4:#F4C430; --lv5:#4CC57A;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25); color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --bg:#0E1412; --surface:#161E1B; --surface-2:#1C2622; --ink:#E6EEEA; --muted:#9AABA4; --line:#2A3632;
+  --accent:#7F9CFF; --accent-ink:#0B1230; --accent-soft:#1F2A4D; --signal:#F4C430; --signal-ink:#1F1700;
+  --ok:#4CC57A; --ok-soft:#14301F; --bad:#FF8466; --bad-soft:#3A1C14; --warn:#E9B54D; --warn-soft:#33270F;
+  --lv0:#34403C; --lv1:#3A5296; --lv2:#5578EE; --lv3:#8FA8FF; --lv4:#F4C430; --lv5:#4CC57A;
+  --shadow:0 1px 2px rgb(0 0 0 / .3), 0 8px 24px rgb(0 0 0 / .25); color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+h1,h2,h3,h4{font-family:var(--f-display);line-height:1.15;margin:0;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800}
+h2{font-size:1.45rem;font-weight:800}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+mark{background:var(--signal);color:var(--signal-ink);padding:0 .2em;border-radius:4px;font-weight:700}
+.ipa{font-family:var(--f-ipa);color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.eyebrow{font-family:var(--f-display);font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line)}
+.top-in{max-width:1120px;margin:0 auto;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:800;font-size:1.05rem;white-space:nowrap;background:none;border:0;padding:0;cursor:pointer}
+.brand .roundel{width:30px;height:30px;border-radius:50%;border:5px solid var(--accent);position:relative;flex:none}
+.brand .roundel::after{content:"";position:absolute;left:-9px;right:-9px;top:50%;height:6px;margin-top:-3px;background:var(--signal);border-radius:2px}
+.nav{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;flex:0 1 auto;min-width:0}
+.nav::-webkit-scrollbar{display:none}
+.nav button{display:flex;align-items:center;gap:6px;border:0;background:none;padding:8px 12px;border-radius:999px;cursor:pointer;font-weight:700;font-size:.92rem;color:var(--muted);white-space:nowrap}
+.nav button svg{width:18px;height:18px;flex:none}
+.nav button:hover{background:var(--surface-2);color:var(--ink)}
+.nav button[aria-current="page"]{background:var(--accent);color:var(--accent-ink)}
+.nav .badge{background:var(--signal);color:var(--signal-ink);border-radius:999px;font-size:.72rem;padding:0 7px;line-height:1.5}
+.save-state{margin-left:auto;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.save-state .dot{width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.save-state.cloud .dot{background:var(--ok)}
+@media (max-width:760px){ .top-in{gap:8px} .nav{order:3;flex-basis:100%} .nav button span.lbl-long{display:none} }
+
+main{max-width:1120px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
+
+/* Generic */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);min-width:0}
+.card.flat{box-shadow:none}
+.stack{display:grid;gap:12px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:10px 16px;border-radius:999px;font-weight:700;cursor:pointer;transition:transform .12s ease, background .15s ease;text-decoration:none;min-height:44px}
+.btn:hover{background:var(--surface-2)}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.06);background:var(--accent)}
+.btn.signal{background:var(--signal);color:var(--signal-ink);border-color:var(--signal)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:.9rem}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn svg{width:18px;height:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:2px 10px;font-size:.8rem;font-weight:700;background:var(--surface-2);border:1px solid var(--line);white-space:nowrap}
+.chip .sw{width:9px;height:9px;border-radius:50%}
+.chip.hard{background:var(--bad-soft);border-color:transparent;color:var(--bad)}
+.chip.saved{background:var(--warn-soft);border-color:transparent;color:var(--warn)}
+.chip.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.pos{font-family:var(--f-display);font-size:.78rem;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:1px 8px;border-radius:6px}
+.speak{border:1px solid var(--line);background:var(--surface);border-radius:50%;width:40px;height:40px;display:inline-grid;place-items:center;cursor:pointer;flex:none}
+.speak svg{width:18px;height:18px}
+.speak:hover{background:var(--accent-soft)}
+.bar{height:10px;border-radius:999px;background:var(--surface-2);border:1px solid var(--line);overflow:hidden}
+.bar > i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .5s ease}
+
+/* Dashboard */
+.hero{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:20px}
+@media (max-width:860px){.hero{grid-template-columns:1fr}}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:10px}
+.kpi{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:14px}
+.kpi b{display:block;font-family:var(--f-display);font-size:1.9rem;font-weight:800;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi span{font-size:.85rem;color:var(--muted)}
+.reco{background:var(--accent);color:var(--accent-ink);border-radius:var(--r);padding:22px;display:grid;gap:12px;align-content:start}
+.reco .eyebrow{color:inherit;opacity:.8}
+.reco h2{font-size:1.35rem}
+.reco p{opacity:.92}
+.reco .btn{background:var(--signal);color:var(--signal-ink);border-color:var(--signal);justify-self:start}
+.quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:12px}
+.qa{display:grid;gap:6px;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:16px;cursor:pointer;transition:transform .15s ease,border-color .15s ease}
+.qa:hover{transform:translateY(-2px);border-color:var(--accent)}
+.qa svg{width:24px;height:24px;color:var(--accent)}
+.qa b{font-family:var(--f-display);font-size:1.05rem}
+.qa span{font-size:.88rem;color:var(--muted)}
+
+/* Metro line */
+.line-wrap{overflow-x:auto;padding:6px 2px 4px}
+.line{display:flex;align-items:flex-start;position:relative;min-width:max-content;padding:0 6px}
+.line::before{content:"";position:absolute;left:24px;right:24px;top:17px;height:8px;background:var(--accent);border-radius:4px;opacity:.25}
+.stn{position:relative;display:grid;justify-items:center;gap:4px;width:44px;background:none;border:0;padding:0;cursor:pointer;color:var(--ink)}
+.stn .c{width:30px;height:30px;margin-top:6px;border-radius:50%;background:var(--surface);border:4px solid var(--lv0);display:grid;place-items:center;font-size:.7rem;font-weight:800;font-family:var(--f-display);transition:transform .15s ease}
+.stn:hover .c{transform:scale(1.12)}
+.stn.part .c{border-color:var(--accent)}
+.stn.done .c{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.stn.master .c{background:var(--lv5);border-color:var(--lv5);color:var(--surface)}
+.stn.here .c{box-shadow:0 0 0 4px var(--signal)}
+.stn small{font-size:.66rem;color:var(--muted)}
+.levels{display:flex;height:14px;border-radius:999px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line)}
+.levels i{display:block;height:100%;transition:width .5s ease}
+.legend{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:.82rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend .sw{width:10px;height:10px;border-radius:3px}
+
+/* Study: vertical line diagram */
+.stations{display:grid;gap:0;position:relative;padding-left:8px}
+.st-row{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:14px;align-items:center;padding:10px 0;position:relative;border:0;background:none;text-align:left;cursor:pointer;width:100%}
+.st-row::before{content:"";position:absolute;left:17px;top:0;bottom:0;width:6px;background:var(--accent);opacity:.25}
+.st-row:first-child::before{top:50%}.st-row:last-child::before{bottom:50%}
+.st-row .c{position:relative;z-index:1;width:40px;height:40px;border-radius:50%;background:var(--surface);border:4px solid var(--lv0);display:grid;place-items:center;font-family:var(--f-display);font-weight:800;font-size:.85rem}
+.st-row.part .c{border-color:var(--accent)}
+.st-row.done .c{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.st-row.master .c{background:var(--lv5);border-color:var(--lv5);color:var(--surface)}
+.st-row:hover .st-name{color:var(--accent)}
+.st-name{font-family:var(--f-display);font-weight:700;min-width:0}
+.st-name small{display:block;font-family:var(--f-body);font-weight:400;color:var(--muted);font-size:.86rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* Word card */
+.word-head{display:flex;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.word-head .w{font-family:var(--f-display);font-size:clamp(2rem,6vw,3rem);font-weight:800;line-height:1;letter-spacing:-.02em;overflow-wrap:anywhere}
+.word-head .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px}
+.sec{border-top:1px solid var(--line);padding-top:14px;display:grid;gap:8px}
+.sec-h{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sec-h .eyebrow{color:var(--accent)}
+.reveal{border:1px dashed var(--line);border-radius:var(--r-sm);padding:12px;color:var(--muted);background:var(--surface-2);cursor:pointer;text-align:left;width:100%}
+.reveal:hover{border-color:var(--accent);color:var(--ink)}
+.ex-line{display:grid;gap:2px}
+.ex-line .tr{color:var(--muted);font-size:.92rem}
+.note{font-size:.85rem;color:var(--muted);background:var(--surface-2);border-radius:var(--r-sm);padding:8px 12px}
+.colls{display:flex;flex-wrap:wrap;gap:6px}
+.colls span{background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:3px 10px;font-size:.92rem}
+.hook{background:var(--warn-soft);border-radius:var(--r-sm);padding:12px 14px}
+.fade-in{animation:fadeIn .28s ease both}
+@keyframes fadeIn{from{opacity:.0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* Library */
+.lib{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:20px;align-items:start}
+@media (max-width:860px){.lib{grid-template-columns:1fr}.lib.detail-open .lib-list{display:none}}
+.lib-list{display:grid;gap:12px}
+.search{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:10px 16px;min-height:44px}
+.filters{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:thin}
+.filters button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.85rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.filters button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;max-height:70vh;overflow:auto;padding:2px}
+.wbtn{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:9px 10px;cursor:pointer;text-align:left;min-width:0}
+.wbtn:hover{border-color:var(--accent)}
+.wbtn[aria-current="true"]{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.wbtn .sw{width:10px;height:10px;border-radius:50%;flex:none}
+.wbtn span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:700}
+
+/* Session */
+.sess-head{display:grid;gap:10px}
+.sess-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.ex{display:grid;gap:18px}
+.prompt-word{font-family:var(--f-display);font-size:clamp(2rem,7vw,3.2rem);font-weight:800;letter-spacing:-.02em;line-height:1.05;overflow-wrap:anywhere}
+.sentence{font-size:clamp(1.15rem,2.6vw,1.4rem);line-height:1.5}
+.blank{display:inline-block;min-width:4.5em;border-bottom:3px solid var(--accent);color:transparent;line-height:1}
+.opts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))}
+.opt{display:flex;align-items:flex-start;gap:12px;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:14px;cursor:pointer;transition:border-color .15s ease, background .15s ease, transform .1s ease;min-height:56px}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt:active:not([disabled]){transform:scale(.99)}
+.opt kbd{font-family:var(--f-display);font-weight:800;font-size:.8rem;border:1px solid var(--line);border-radius:6px;padding:0 6px;color:var(--muted);flex:none}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .3s ease}
+.opt[disabled]{cursor:default}
+@keyframes shake{0%,100%{transform:none}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.answer{display:flex;gap:10px;flex-wrap:wrap}
+.answer input{flex:1 1 220px;min-width:0;border:2px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:12px 14px;font-size:1.1rem;min-height:50px}
+.answer input:focus{border-color:var(--accent);outline:none}
+.answer input.right{border-color:var(--ok);background:var(--ok-soft)}
+.answer input.wrong{border-color:var(--bad);background:var(--bad-soft)}
+textarea{width:100%;min-height:110px;border:2px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:12px 14px;font-size:1.05rem;resize:vertical}
+textarea:focus{border-color:var(--accent);outline:none}
+.fb{border-radius:var(--r);padding:18px;display:grid;gap:10px;border:2px solid transparent;animation:fadeIn .25s ease both}
+.fb.ok{background:var(--ok-soft);border-color:var(--ok)}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad)}
+.fb.warn{background:var(--warn-soft);border-color:var(--warn)}
+.fb-head{display:flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:800;font-size:1.15rem}
+.fb.ok .fb-head{color:var(--ok)} .fb.bad .fb-head{color:var(--bad)} .fb.warn .fb-head{color:var(--warn)}
+.fb-head svg{width:22px;height:22px}
+.fb-body{display:grid;gap:8px}
+.mini{background:var(--surface);border-radius:var(--r-sm);padding:12px 14px;display:grid;gap:6px;border:1px solid var(--line)}
+
+/* Flashcard */
+.flash{perspective:1200px}
+.flash-in{position:relative;min-height:300px;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+.flash.flipped .flash-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:var(--r);border:1px solid var(--line);background:var(--surface-2);padding:22px;display:grid;align-content:center;gap:10px;overflow:auto}
+.face.back{transform:rotateY(180deg);align-content:start}
+.face.front{justify-items:center;text-align:center}
+
+/* Match */
+.match{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:12px}
+@media (max-width:560px){.match{grid-template-columns:1fr}}
+.match .col{display:grid;gap:8px;align-content:start}
+.mitem{border:2px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:10px 12px;text-align:left;cursor:pointer;min-height:48px;transition:border-color .15s ease, background .15s ease}
+.mitem.word{font-family:var(--f-display);font-weight:800}
+.mitem.sel{border-color:var(--accent);background:var(--accent-soft)}
+.mitem.done{border-color:var(--ok);background:var(--ok-soft);cursor:default}
+.mitem.wrong{border-color:var(--bad);background:var(--bad-soft);animation:shake .3s ease}
+
+/* Steps */
+.steps{display:flex;gap:6px;flex-wrap:wrap}
+.steps button{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px 4px 4px;font-size:.85rem;font-weight:700;cursor:pointer;color:var(--muted)}
+.steps button i{font-style:normal;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);font-family:var(--f-display);font-size:.78rem}
+.steps button[aria-current="step"]{border-color:var(--accent);color:var(--ink)}
+.steps button[aria-current="step"] i{background:var(--accent);color:var(--accent-ink)}
+.steps button.seen i{background:var(--accent-soft);color:var(--accent)}
+.foot{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+
+/* Challenge */
+.score{display:flex;gap:10px;flex-wrap:wrap}
+.score div{background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 12px;font-size:.85rem}
+.score b{font-family:var(--f-display);font-size:1.1rem;font-variant-numeric:tabular-nums}
+.streak b{color:var(--warn)}
+.tier{display:inline-flex;gap:3px;vertical-align:middle}
+.tier i{width:8px;height:14px;border-radius:2px;background:var(--line)}
+.tier i.on{background:var(--signal)}
+
+/* Progress charts */
+.hbar{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr) 64px;gap:10px;align-items:center;font-size:.9rem}
+.hbar .track{height:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.hbar .track i{display:block;height:100%;background:var(--accent)}
+.hbar .v{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted)}
+.cols{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;align-items:end;height:150px;padding-top:18px}
+.cols .colb{display:grid;align-content:end;justify-items:center;gap:4px;height:100%}
+.cols .colb i{width:100%;max-width:38px;background:var(--accent);border-radius:6px 6px 2px 2px;min-height:2px}
+.cols .colb b{font-size:.8rem;font-variant-numeric:tabular-nums}
+.cols .colb small{font-size:.72rem;color:var(--muted)}
+.wl{display:grid;gap:6px}
+.wl > div{display:flex;justify-content:space-between;gap:10px;align-items:center;border-bottom:1px solid var(--line);padding:6px 0}
+.wl > div:last-child{border-bottom:0}
+.wl button{border:0;background:none;padding:0;font-weight:700;cursor:pointer;text-align:left;color:var(--ink)}
+.wl button:hover{color:var(--accent)}
+.empty{color:var(--muted);font-size:.92rem;padding:8px 0}
+details summary{cursor:pointer;font-weight:700}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-weight:700;opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;z-index:20;max-width:calc(100% - 32px);text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.ring{width:120px;height:120px;border-radius:50%;display:grid;place-items:center;flex:none}
+.ring b{font-family:var(--f-display);font-size:1.8rem;font-weight:800;background:var(--surface);width:92px;height:92px;border-radius:50%;display:grid;place-items:center}
+.code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.75rem;word-break:break-all;max-height:120px;overflow:auto;background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:10px}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+</style>
+
+<header class="top">
+  <div class="top-in">
+    <button class="brand" data-act="go" data-v="home" aria-label="Inicio"><span class="roundel"></span>The Metro · Vocab</button>
+    <nav class="nav" id="nav" aria-label="Secciones"></nav>
+    <div class="save-state" id="saveState" title="Dónde se guarda tu progreso"><span class="dot"></span><span>En este navegador</span></div>
+  </div>
+</header>
+<main id="view"></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>const W=[];</script>
+<script>// Vocabulario de "The Metro" — parte 1/4
+// Tupla: [word, pos, ipa, es, def, exMaterial, simple, ex1, ex1es, ex2, ex2es, collocations, synonyms, mistake, hook]
+// En ex1/ex2 la palabra (en la forma usada) va entre [corchetes] para los ejercicios de completar.
+W.push(
+["advances","n","/ədˈvɑːnsɪz/","insinuaciones, acercamientos de tipo sexual o romántico","approaches of a sexual nature","The waitress didn't appreciate the advances from the men in the bachelor party.","Attempts to start a romantic or sexual relationship with someone, often unwanted.","She politely rejected his [advances] at the office party.","Ella rechazó educadamente sus insinuaciones en la fiesta de la oficina.","He kept making unwelcome [advances] until the manager asked him to leave.","Siguió haciendo insinuaciones no deseadas hasta que el gerente le pidió que se fuera.","make advances (to somebody); unwanted / unwelcome advances; reject somebody's advances","flirting = coquetear, más ligero y juguetón; advances = intentos más directos, a menudo no deseados.","En este sentido casi siempre va en plural: ‘make advances’, no ‘make an advance’. ‘Advance’ en singular suele significar ‘avance’ o ‘anticipo de dinero’.","Alguien ‘avanza’ hacia ti sin permiso: advances = pasos hacia adelante no invitados."],
+["amicably","adv","/ˈæmɪkəbli/","amistosamente, de forma cordial","in a friendly way","The taxi driver amicably offered the poor lady a free ride.","In a friendly, peaceful way, without arguing.","The couple divorced [amicably] and stayed good friends.","La pareja se divorció de forma amistosa y siguieron siendo buenos amigos.","The neighbours settled the dispute [amicably] over a cup of tea.","Los vecinos resolvieron la disputa amistosamente con una taza de té.","part amicably; settle (a dispute) amicably; resolve amicably; split up amicably","friendly = amistoso (adjetivo). amicably se usa sobre todo para acuerdos o separaciones sin conflicto.","No digas ‘friendly-ly’; el adverbio formal es ‘amicably’ o ‘in a friendly way’.","Amic- = amigo (amicus en latín). Amicably = como amigos."],
+["amorous","adj","/ˈæmərəs/","apasionado, amoroso (con deseo romántico o sexual)","full of passion","The couple that met on the beach had an amorous relationship for one week.","Showing romantic or sexual desire.","He sent her an [amorous] letter full of poetry.","Le envió una carta apasionada llena de poesía.","The cat became [amorous] every spring.","El gato se ponía en celo cada primavera.","amorous advances; amorous relationship; amorous glances; feel amorous","loving = cariñoso (amor tranquilo); amorous = con deseo y pasión; romantic = romántico, más general.","No es ‘amoroso’ en el sentido de ‘tierno con un bebé’; para eso usa ‘loving’ o ‘affectionate’.","Amor + -ous: lleno de amor apasionado."],
+["antithesis","n","/ænˈtɪθəsɪs/","lo totalmente opuesto, la antítesis","the complete opposite","Even though they are identical twins, Joe and John are the antithesis of each other.","Something that is the exact opposite of something else.","His calm attitude is the [antithesis] of his brother's anger.","Su actitud tranquila es lo opuesto a la ira de su hermano.","This noisy hotel is the [antithesis] of a relaxing holiday.","Este hotel ruidoso es todo lo contrario a unas vacaciones relajantes.","the antithesis of something; the very antithesis; complete antithesis","opposite = palabra común; antithesis = formal y enfática, ‘el polo opuesto’.","Se dice ‘the antithesis OF something’, no ‘to’. Plural: antitheses /ænˈtɪθəsiːz/.","Anti- (contra) + tesis (idea): la idea contraria."],
+["astute","adj","/əˈstjuːt/","astuto, perspicaz","crafty, clever","The astute fisherman had the hole in the boat patched before it sank.","Clever at understanding situations quickly and using them to your advantage.","She is an [astute] businesswoman who never misses an opportunity.","Es una empresaria astuta que nunca pierde una oportunidad.","That was an [astute] observation about the market.","Esa fue una observación muy perspicaz sobre el mercado.","astute observation; astute businessman; politically astute; astute judge of character","smart = listo (general); cunning = astuto con engaño (negativo); astute = astuto de forma positiva, perspicaz.","Es un falso amigo casi perfecto, pero ‘astute’ suele ser elogio, no implica trampa.","Suena igual que ‘astuto’: es una de las fáciles."],
+["atrocity","n","/əˈtrɒsəti/","atrocidad, acto de crueldad extrema","very cruel happening or treatment","It was an atrocity when George's friends locked him outside in the snow with no shoes or socks.","An extremely cruel and shocking act.","The soldiers were accused of committing an [atrocity] against civilians.","Los soldados fueron acusados de cometer una atrocidad contra civiles.","Leaving the dog alone in the hot car was an [atrocity].","Dejar al perro solo en el coche caliente fue una atrocidad.","commit an atrocity; war atrocities; a terrible atrocity","cruelty = crueldad (cualidad); atrocity = un acto concreto, extremo y terrible.","Se usa con ‘commit’: commit an atrocity (no ‘do an atrocity’).","Atroz → atrocity: suena igual en español."],
+["bizarre","adj","/bɪˈzɑː(r)/","muy extraño, estrafalario","very strange","It was so bizarre when the clown at the party knelt down and asked Judy to marry him.","Very strange and unusual, sometimes funny.","It was a [bizarre] dream about flying fish.","Fue un sueño muy extraño sobre peces voladores.","He wore a [bizarre] hat made of newspaper.","Llevaba un sombrero estrafalario hecho de periódico.","a bizarre situation; bizarre behaviour; quite bizarre; for some bizarre reason","strange = raro (neutro); weird = raro (informal); bizarre = rarísimo, chocante.","Falso amigo: en español ‘bizarro’ también significa ‘valiente’. En inglés solo es ‘muy raro’.","Imagina un bazar lleno de objetos rarísimos: bazar → bizarre."],
+["bleak","adj","/bliːk/","desolador, sombrío, poco acogedor","discouraging, unappealing","I couldn't believe that homeless people were living in that bleak alley.","Cold, empty and depressing; without hope or comfort.","The future looked [bleak] after the factory closed.","El futuro parecía sombrío después de que cerró la fábrica.","They walked across a [bleak], windy hill.","Caminaron por una colina desolada y ventosa.","bleak future; bleak outlook; bleak landscape; look bleak","gloomy = triste y oscuro; bleak = frío, vacío y sin esperanza.","No confundir con ‘black’. ‘Bleak’ /iː/ larga.","Bleak suena a ‘bleh’: todo gris, frío y sin ánimo."],
+["blower","n (slang)","/ˈbləʊə(r)/","(jerga británica) el teléfono","(slang) the telephone","Sandy got on the blower with her sister as soon as she heard the juicy gossip.","Informal British word for the telephone.","Get on the [blower] and order us a pizza.","Agarra el teléfono y pídenos una pizza.","He's been on the [blower] to his mum all evening.","Ha estado al teléfono con su mamá toda la tarde.","on the blower; get on the blower (to somebody)","phone = teléfono (normal). blower es coloquial y algo anticuado; casi siempre ‘on the blower’.","No lo uses en contextos formales. Literalmente ‘blower’ es ‘soplador’.","Antes se ‘soplaba’ en un tubo para hablar a otra sala: blower = teléfono."],
+["brief somebody","v","/briːf ˈsʌmbədi/","informar a alguien, darle los datos necesarios","give somebody the background information/details they need","“Can you brief me on the condition of the patient?” the doctor asked the nurse.","To give someone the key information they need before they act.","The captain [briefed] the crew before take-off.","El capitán informó a la tripulación antes del despegue.","Can you [brief] me on what happened at the meeting?","¿Puedes ponerme al tanto de lo que pasó en la reunión?","brief somebody on/about something; be fully briefed; brief the press","inform = informar (general); brief = dar un resumen preparatorio y práctico.","Se dice ‘brief somebody ON something’, no ‘brief something to somebody’. Como adjetivo, ‘brief’ significa ‘breve’.","Un briefing es breve: brief = darte la información en pocas palabras antes de actuar."],
+["brusquely","adv","/ˈbruːskli/","bruscamente, de forma seca","quickly, abruptly","The woman brusquely pointed out the thief in the line up of criminals.","In a quick, short way that seems a little rude.","“Not now,” he said [brusquely] and closed the door.","—Ahora no —dijo bruscamente y cerró la puerta.","The receptionist answered [brusquely] because she was busy.","La recepcionista respondió de forma seca porque estaba ocupada.","say brusquely; reply brusquely; dismiss somebody brusquely","rudely = con mala educación; brusquely = rápido y cortante, no siempre con mala intención.","Pronunciación: /ˈbruːskli/, la ‘que’ suena /sk/.","Suena a ‘brusco’: brusque → brusquely."],
+["buskers","n","/ˈbʌskəz/","músicos o artistas callejeros que actúan por dinero","people who beg or entertain for money on the street","I gave the buskers a few dollars to play my favourite song.","Street performers who play music or perform for money from people passing by.","[Buskers] were playing guitar in the metro station.","Unos músicos callejeros tocaban guitarra en la estación de metro.","The square was full of [buskers] and tourists.","La plaza estaba llena de artistas callejeros y turistas.","street buskers; a busker plays / performs; give money to a busker","beggar = mendigo (solo pide); busker = actúa a cambio de monedas.","‘Busker’ es más británico; en EE. UU. también ‘street performer’.","Busker suena a ‘busca’: busca monedas tocando música."],
+["cannabis","n","/ˈkænəbɪs/","cannabis, marihuana","drug from a hemp plant","The police found cannabis in the house where the thieves were living.","A drug made from the hemp plant, smoked or eaten.","He was arrested for growing [cannabis] in his garden.","Fue arrestado por cultivar cannabis en su jardín.","Some countries allow [cannabis] for medical use.","Algunos países permiten el cannabis para uso medicinal.","smoke cannabis; possession of cannabis; medical cannabis; grow cannabis","marijuana / weed (informal) son sinónimos. cannabis es el término neutro o legal.","Es incontable: ‘some cannabis’, no ‘a cannabis’.","Igual que en español: una de las fáciles."],
+["captivated","past participle","/ˈkæptɪveɪtɪd/","cautivado, fascinado","unable to stop looking at something","The young children were captivated by the fireworks display.","So interested or charmed that you can't look away.","The audience was [captivated] by her voice.","El público quedó cautivado por su voz.","I was [captivated] by the view from the top of the tower.","Quedé fascinado con la vista desde lo alto de la torre.","be captivated by; captivate an audience; captivating smile","fascinated = fascinado (interés); captivated = atrapado, sin poder apartar la atención.","Usa ‘captivated BY’, no ‘captivated with’ (menos común).","Captive = cautivo: tu atención queda prisionera."],
+["caught in the act","idiom","/kɔːt ɪn ðə ækt/","pillado en el acto (aquí: en plena relación sexual)","found in the middle of doing something (here, having sex)","I caught my aunt and uncle in the act in our basement when I was a child.","Discovered while doing something secret or wrong, at that exact moment.","The thief was [caught in the act] of opening the safe.","El ladrón fue pillado en el acto abriendo la caja fuerte.","She came home early and [caught] them [in the act].","Llegó temprano a casa y los pilló con las manos en la masa.","catch somebody in the act; be caught in the act (of doing something)","red-handed = con las manos en la masa (para delitos). in the act puede tener tono sexual, como en la lectura.","Se puede separar: ‘catch somebody in the act’. Usa ‘of + -ing’: in the act of stealing.","‘Act’ = acto: te pillan en mitad del acto."],
+["Chihuahua","n","/tʃɪˈwɑːwə/","chihuahua (raza de perro diminuta)","tiny breed of Mexican dog","Chihuahuas have huge eyes for such little dogs.","A very small dog breed originally from Mexico, with big eyes and ears.","She carried her [Chihuahua] in a handbag.","Llevaba a su chihuahua en el bolso.","The tiny [Chihuahua] barked at the huge dog.","El diminuto chihuahua le ladró al perro enorme.","a tiny Chihuahua; Chihuahua puppy","Es un nombre propio de raza; va con mayúscula en inglés.","Pronunciación: /tʃɪˈwɑːwə/ ‘chi-uá-ua’.","Como el estado mexicano de Chihuahua."],
+["clairvoyants","n","/kleəˈvɔɪənts/","clarividentes, videntes","people who claim they are able to see the future","I asked Becky if she was a clairvoyant because she always knows when I am dating someone new.","People who say they can see the future or know things without being told.","She paid a [clairvoyant] to tell her about her love life.","Le pagó a una vidente para que le hablara de su vida amorosa.","Many [clairvoyants] work at the fair, reading palms.","Muchos videntes trabajan en la feria leyendo la mano.","consult a clairvoyant; a professional clairvoyant","psychic = vidente (más común en EE. UU.); fortune-teller = adivino/a (cartas, manos).","Viene del francés: ‘clair’ (claro) + ‘voyant’ (que ve).","Clair-voyant = ‘ve claro’ lo que otros no ven."],
+["claustrophobic","adj","/ˌklɔːstrəˈfəʊbɪk/","claustrofóbico, agobiante por falta de espacio","not having enough space for people to feel comfortable","I tried to sleep in the tiny attic, but it was too claustrophobic.","Describes a place so small or crowded that you feel trapped.","The lift was small and [claustrophobic].","El ascensor era pequeño y agobiante.","I feel [claustrophobic] in crowded metro carriages.","Me siento claustrofóbico en los vagones de metro llenos.","feel claustrophobic; a claustrophobic room / atmosphere","cramped = sin espacio (describe el lugar); claustrophobic = describe el lugar o lo que sientes.","Sirve para personas (I feel claustrophobic) y para lugares (a claustrophobic room).","Claustro (lugar cerrado) + fobia: miedo a los espacios cerrados."],
+["coax","v","/kəʊks/","persuadir con suavidad, engatusar","persuade gently","Can I coax you into buying some chocolates for charity?","To gently persuade someone to do something, with patience and kindness.","She [coaxed] the cat out from under the bed.","Convenció con suavidad al gato para que saliera de debajo de la cama.","He [coaxed] his daughter into eating her vegetables.","Persuadió con paciencia a su hija para que comiera verduras.","coax somebody into doing something; coax somebody out of something; coax a smile","persuade = persuadir (general); coax = con dulzura y paciencia; force = obligar.","Estructura: coax somebody INTO + -ing (coax him into going), no ‘coax him to go’ (posible pero menos natural).","Coax suena a ‘coqueta’: convences con dulzura."],
+["come to a head","v (idiom)","/kʌm tu ə hed/","llegar a un punto crítico","come to a point where you can't ignore something any more","The couple's financial problems came to a head when Nancy became pregnant.","When a problem becomes so serious that you must deal with it.","The tension between them [came to a head] at dinner.","La tensión entre ellos llegó a un punto crítico en la cena.","Things [came to a head] when the boss refused to pay them.","Las cosas estallaron cuando el jefe se negó a pagarles.","things come to a head; matters come to a head; bring something to a head","reach a crisis = llegar a una crisis. come to a head se usa para problemas que venían creciendo.","No es ‘come to the head’. Siempre ‘a head’.","Como un grano que ‘llega a la cabeza’ y tiene que reventar."],
+["concierge","n","/ˈkɒnsieəʒ/","conserje, encargado de edificio u hotel","resident caretaker for apartments or hotel","I asked the concierge to call a taxi for room 101.","A person in a hotel or apartment building who helps residents or guests.","The [concierge] recommended a good restaurant nearby.","El conserje recomendó un buen restaurante cerca.","Leave the keys with the [concierge] downstairs.","Deja las llaves con el conserje de abajo.","hotel concierge; ask the concierge; concierge desk; concierge service","receptionist = recepcionista (registra); concierge = ayuda con servicios, recomendaciones y encargos.","Pronunciación francesa: termina en /ʒ/, como ‘llave’ en argentino.","Conserje ↔ concierge: casi la misma palabra."],
+["consultation","n","/ˌkɒnslˈteɪʃn/","consulta, reunión para hablar de una posible acción o servicio","a meeting to discuss possible future action or business","The bride often goes for a hair consultation before her big day in the salon.","A meeting with an expert to get advice or plan something.","I booked a free [consultation] with a lawyer.","Reservé una consulta gratuita con un abogado.","After a short [consultation], the doctor changed my medicine.","Tras una breve consulta, el médico cambió mi medicamento.","free consultation; book a consultation; in consultation with; initial consultation","meeting = reunión (general); consultation = reunión para recibir consejo profesional.","Se dice ‘have / book a consultation’, no ‘make a consultation’.","Consultar → consultation: igual que ‘consulta’."],
+["corpse","n","/kɔːps/","cadáver","dead body","The shipmates buried the corpse at sea.","The dead body of a person.","The police found a [corpse] in the river.","La policía encontró un cadáver en el río.","The detective examined the [corpse] carefully.","El detective examinó el cadáver con cuidado.","find a corpse; identify a corpse; a decomposing corpse","body = cuerpo (más neutro); corpse = cadáver (más crudo); remains = restos.","No confundir con ‘corps’ /kɔː/ (cuerpo militar), que se pronuncia sin ‘p’ ni ‘s’.","Corpse ↔ ‘corpus’ / cuerpo: un cuerpo sin vida."],
+["cramped","adj","/kræmpt/","estrecho, apretado, sin espacio","having no spare room","It was so cramped on the bus that we had to sit on our bags.","Too small for the people or things inside it.","Our first apartment was tiny and [cramped].","Nuestro primer departamento era diminuto y apretado.","Five of us travelled in a [cramped] little car.","Viajamos cinco en un coche pequeño y estrecho.","cramped conditions; cramped flat / room; cramped space; feel cramped","small = pequeño; cramped = demasiado pequeño para lo que contiene, incómodo.","No confundir con ‘cramp’ (calambre) aunque comparten raíz.","Te da un calambre (cramp) por estar tan apretado: cramped."],
+["crave","v","/kreɪv/","desear intensamente, antojarse (a menudo comida)","want badly (often food)","My sister craved peaches through her whole pregnancy.","To want something very strongly, often food.","I always [crave] chocolate when I'm tired.","Siempre se me antoja chocolate cuando estoy cansado.","Children [crave] attention from their parents.","Los niños anhelan la atención de sus padres.","crave attention; crave sugar / chocolate; craving for something","want = querer (neutro); crave = deseo intenso, casi físico; yearn for = anhelo emocional.","El verbo es transitivo: ‘I crave chocolate’, no ‘I crave for chocolate’. El sustantivo sí: ‘a craving for’.","Crave suena a ‘cave’: un deseo profundo como una cueva."],
+["curse","v","/kɜːs/","maldecir, soltar palabrotas","use bad or rude language","My uncle was cursing as the Christmas lights fell off the roof.","To say rude or offensive words because you are angry.","He [cursed] when he hit his finger with the hammer.","Soltó una palabrota cuando se golpeó el dedo con el martillo.","She [cursed] the traffic all the way home.","Maldijo el tráfico todo el camino a casa.","curse loudly; curse under your breath; curse somebody / something","swear = decir palabrotas (más común); curse también = echar una maldición.","Como sustantivo, ‘a curse’ es una maldición. El verbo en pasado: cursed /kɜːst/.","Imagina a un pirata que maldice (curses) la tormenta: curse = maldecir."],
+["cynic","n","/ˈsɪnɪk/","cínico, escéptico, alguien que desconfía de la sinceridad ajena","a person who doesn't believe another is being sincere","I never vote because I'm a cynic when it comes to politicians.","A person who believes people usually act only for themselves.","He is a [cynic] who thinks every charity is a scam.","Es un escéptico que cree que toda organización benéfica es una estafa.","Don't be such a [cynic]; maybe she really wants to help.","No seas tan desconfiado; quizá de verdad quiere ayudar.","a hardened cynic; a born cynic; cynical about","sceptic = duda de las afirmaciones; cynic = duda de las intenciones de la gente.","Falso amigo parcial: en español ‘cínico’ suele ser ‘desvergonzado’. En inglés, cynic = desconfiado.","Un cynic ve ‘sin’ (pecado) en las intenciones de todos."],
+["decapitate","v","/dɪˈkæpɪteɪt/","decapitar","cut someone's head off","Long ago, prisoners were decapitated after committing serious crimes.","To cut off someone's head.","The statue was [decapitated] during the riots.","La estatua fue decapitada durante los disturbios.","In the film, the hero [decapitates] the monster.","En la película, el héroe decapita al monstruo.","be decapitated; decapitated body","behead = sinónimo más común y menos formal.","Se usa mucho en pasiva: ‘was decapitated’.","De- (quitar) + capit (cabeza, como ‘capital’)."],
+["defer","v","/dɪˈfɜː(r)/","aplazar, posponer","put off until later","My holiday time was deferred because our company was so busy this summer.","To delay something until a later time.","The university let her [defer] her studies for a year.","La universidad le permitió aplazar sus estudios un año.","We decided to [defer] the decision until next month.","Decidimos posponer la decisión hasta el mes próximo.","defer payment; defer a decision; deferred until; defer a place at university","postpone = posponer (más común); delay = retrasar; defer = formal, sobre todo en trámites.","Doble ‘r’ en pasado: deferred. ‘Defer TO somebody’ significa ceder ante su opinión, es otro sentido.","Defer ≈ diferir: ‘diferir’ un pago es aplazarlo."],
+["deflect","v","/dɪˈflekt/","desviar, esquivar","turn away","I always deflect phone calls from people trying to sell me something.","To make something change direction, or avoid dealing with it.","The politician [deflected] the difficult question.","El político esquivó la pregunta difícil.","The goalkeeper [deflected] the ball over the bar.","El portero desvió el balón por encima del travesaño.","deflect criticism; deflect attention; deflect a question; deflect the blame","avoid = evitar; deflect = desviar algo que viene hacia ti (preguntas, críticas, pelotas).","Va con objeto directo: deflect criticism (sin ‘from’ obligatorio). ‘Deflect attention FROM something’.","Un escudo deflector desvía los rayos: deflect."],
+["demoralized","adj","/dɪˈmɒrəlaɪzd/","desmoralizado, sin ánimo","having lost hope","The demoralized cyclist put his damaged bike on his shoulders and walked to the finish line.","Having lost confidence and the will to continue.","The team felt [demoralized] after losing ten games.","El equipo se sintió desmoralizado tras perder diez partidos.","[Demoralized] workers often leave their jobs.","Los trabajadores desmoralizados a menudo dejan sus trabajos.","feel demoralized; completely demoralized; a demoralized team","discouraged = desanimado (más leve); demoralized = sin moral ni confianza.","Ortografía: demoralized (EE. UU.) / demoralised (RU). No tiene que ver con ‘moral’ ética, sino con ‘moral’ = ánimo.","Igual que en español: se te va la moral."],
+["despair","v","/dɪˈspeə(r)/","desesperar, perder la esperanza","worry intently","Amanda despaired because her husband was more than three hours late from work.","To lose all hope or feel extremely worried.","Don't [despair]; we will find a solution.","No te desesperes; encontraremos una solución.","She [despaired] of ever finding a good job.","Perdió la esperanza de encontrar algún día un buen trabajo.","despair of (doing) something; in despair; sheer despair","worry = preocuparse; despair = perder toda esperanza, más intenso.","‘Despair OF + -ing’: despair of finding. También es sustantivo: ‘in despair’.","Des- (sin) + spair (esperanza, como ‘esperar’): des-esperar."],
+["despondently","adv","/dɪˈspɒndəntli/","con desánimo, abatidamente","without hope","I despondently called for help but I knew there was nobody home.","In a sad way, without hope or energy.","He looked [despondently] at his exam results.","Miró con desánimo los resultados de su examen.","She sat [despondently] by the window, waiting.","Se sentó abatida junto a la ventana, esperando.","stare / sit / say despondently","sadly = con tristeza; despondently = con tristeza y sin esperanza de que mejore.","Adjetivo: despondent. No existe ‘despondly’.","Desp- como en despair: sin esperanza, ‘desplomado’."],
+["Deutschmark","n","/ˈdɔɪtʃmɑːk/","marco alemán (moneda anterior al euro)","German currency (pre-Euro)","I transferred my American savings into Deutschmarks before I went to Germany.","The money used in Germany before the euro.","The coffee cost two [Deutschmarks] in 1995.","El café costaba dos marcos alemanes en 1995.","Germany replaced the [Deutschmark] with the euro in 2002.","Alemania reemplazó el marco alemán por el euro en 2002.","in Deutschmarks; the German Deutschmark","También ‘Deutsche Mark’ o ‘D-Mark’.","Pronunciación: /ˈdɔɪtʃ/ ‘doich’.","Deutsch = alemán; Mark = marco."],
+["disdainfully","adv","/dɪsˈdeɪnfəli/","con desdén, con desprecio","without respect, with dislike","My grandmother stared at my new boyfriend disdainfully because of his long hair.","In a way that shows you think someone or something is not good enough.","She looked [disdainfully] at the cheap wine.","Miró con desdén el vino barato.","He spoke [disdainfully] about people who don't read.","Habló con desprecio de la gente que no lee.","look / stare / say disdainfully","contemptuously = con desprecio (más fuerte); disdainfully = con superioridad, mirando por encima del hombro.","Adjetivo: disdainful; sustantivo: disdain.","Disdain ≈ desdén: suenan parecido."],
+["dismally","adv","/ˈdɪzməli/","lúgubremente, de forma deprimente","gloomily, without hope","The children stared dismally out the window until the sun finally came out.","In a sad, gloomy way; or very badly.","The team played [dismally] and lost 5–0.","El equipo jugó pésimamente y perdió 5 a 0.","It rained [dismally] all weekend.","Llovió de forma deprimente todo el fin de semana.","fail dismally; stare dismally; perform dismally","‘fail dismally’ = fracasar estrepitosamente; también significa ‘tristemente’.","Una sola ‘l’ en dismal, dos en dismally.","Dismal suena a ‘dis-mal’: todo mal y gris."],
+["dismay","n","/dɪsˈmeɪ/","consternación, angustia","consternation, distress","Rebecca was full of dismay when we jumped out from behind the couch.","A feeling of shock and disappointment or worry.","To my [dismay], the shop was closed.","Para mi consternación, la tienda estaba cerrada.","She watched in [dismay] as the train left without her.","Observó consternada cómo el tren se iba sin ella.","to somebody's dismay; in dismay; express dismay","disappointment = decepción; dismay = sorpresa desagradable con preocupación.","Expresiones fijas: ‘to my dismay’, ‘in dismay’ (no ‘with dismay’ tan frecuente).","Dis-may: ‘no puede (may) ser’, piensas consternado."],
+["disparity","n","/dɪˈspærəti/","disparidad, gran diferencia","big difference","There was quite a disparity between Anne and George's accounts of why their marriage failed.","A big difference, often one that seems unfair.","There is a huge [disparity] between rich and poor.","Hay una enorme disparidad entre ricos y pobres.","Police noticed a [disparity] in the two witnesses' stories.","La policía notó una disparidad en las versiones de los dos testigos.","disparity between A and B; income disparity; a wide disparity","difference = diferencia (neutro); disparity = diferencia grande y llamativa, a menudo injusta.","Usa ‘disparity BETWEEN’, no ‘disparity of’ para comparar dos cosas.","Dispar en español = desigual: disparity."],
+["dispatch","v","/dɪˈspætʃ/","enviar, despachar (a menudo servicios de emergencia)","send to do something (often emergency services)","The police dog team was dispatched to an area in the woods where the criminal had been spotted.","To send someone or something somewhere for a purpose.","An ambulance was [dispatched] to the scene of the accident.","Se envió una ambulancia al lugar del accidente.","The company [dispatches] orders within 24 hours.","La empresa despacha los pedidos en 24 horas.","dispatch an ambulance / troops; dispatch goods; be dispatched to","send = enviar (general); dispatch = enviar con rapidez y un propósito oficial.","Muy usado en pasiva: ‘was dispatched to’. Ortografía británica alternativa: despatch.","Dispatch = despachar: el despachador de emergencias."]
+);
+
+// Vocabulario de "The Metro" — parte 2/4
+W.push(
+["domain","n","/dəˈmeɪn/","ámbito, campo de interés o especialidad","subject of interest or expertise","Since I was five years old dancing has been my domain.","An area of knowledge or activity that someone controls or knows well.","Cooking is my father's [domain]; nobody else touches the kitchen.","La cocina es el terreno de mi padre; nadie más toca la cocina.","Technology is outside my [domain], so ask my sister.","La tecnología está fuera de mi campo, así que pregúntale a mi hermana.","in the domain of; somebody's domain; public domain; outside my domain","field = campo (académico); area = área; domain = territorio propio, donde alguien manda o domina.","No lo confundas con ‘domain name’ (dominio de internet), que es otro uso.","Domain ≈ dominio: lo que dominas."],
+["duvet","n","/ˈduːveɪ/","edredón (relleno de plumas)","heavy quilt filled with feathers","We don't use our duvet on the bed in the summer; we just use a sheet.","A thick, soft cover for a bed, filled with feathers or other material.","I bought a warm [duvet] for the winter.","Compré un edredón calentito para el invierno.","She stayed under the [duvet] all Sunday morning.","Se quedó bajo el edredón toda la mañana del domingo.","duvet cover; a thick / warm duvet; under the duvet","quilt = colcha acolchada; comforter = edredón (EE. UU.); duvet = término británico.","Pronunciación: /ˈduːveɪ/, la ‘t’ no suena (palabra francesa).","Duvet suena a ‘du-vé’: suave como plumas francesas."],
+["ecstasy","n","/ˈekstəsi/","éxtasis, placer intenso (a menudo sexual)","great pleasure (often sexual)","Eileen had never known true ecstasy before she started dating Charles.","A feeling of extreme happiness or pleasure.","The fans screamed in [ecstasy] when their team scored.","Los aficionados gritaron extasiados cuando su equipo marcó.","Eating that cake was pure [ecstasy].","Comer ese pastel fue puro éxtasis.","in ecstasy; pure ecstasy; ecstasy of joy","joy = alegría; bliss = dicha tranquila; ecstasy = placer intenso, desbordante. También es el nombre de una droga.","Ortografía: ecstasy (con ‘cs’ y ‘sy’), no ‘extasy’.","Ec-stasy: ‘fuera de ti’ (ec-) de tanto placer."],
+["emerge","v","/iˈmɜːdʒ/","salir, emerger, aparecer","come out from somewhere","The mouse finally emerged from under the fridge.","To come out of a place where you were hidden or inside.","A man [emerged] from the dark tunnel.","Un hombre salió del túnel oscuro.","New details [emerged] during the investigation.","Surgieron nuevos detalles durante la investigación.","emerge from; emerge as; it emerged that; new evidence emerged","appear = aparecer; emerge = salir de dentro de algo o hacerse visible poco a poco.","Va con ‘from’: emerge from the water. No lleva objeto directo.","Emerger del agua: emerge."],
+["enduring","adj","/ɪnˈdjʊərɪŋ/","duradero, perdurable","lasting a long time","The minister wished the newlyweds enduring happiness and love.","Continuing for a long time; lasting.","Their friendship was strong and [enduring].","Su amistad era fuerte y duradera.","The Beatles had an [enduring] influence on music.","Los Beatles tuvieron una influencia perdurable en la música.","enduring love / friendship; enduring legacy; enduring appeal","lasting = duradero (común); permanent = permanente; enduring = que resiste el paso del tiempo, positivo.","No confundir con el verbo ‘endure’ (soportar). ‘Enduring’ como adjetivo = duradero.","Endure = aguantar: lo enduring aguanta años."],
+["envisage","v","/ɪnˈvɪzɪdʒ/","imaginar, prever","imagine","I envisage my first home as an old farm in the country.","To imagine something as a future possibility.","I [envisage] a future where everyone has clean water.","Imagino un futuro en el que todos tengan agua potable.","We don't [envisage] any problems with the plan.","No prevemos ningún problema con el plan.","envisage a future; envisage doing something; envisage problems","imagine = imaginar (general); envisage = imaginar algo futuro o un plan. ‘Envision’ es la forma americana.","Estructura: envisage + -ing (envisage working), no ‘envisage to work’.","En-visage: poner algo delante de tu cara (visage) mentalmente."],
+["evaporate","v","/ɪˈvæpəreɪt/","evaporarse, desaparecer","disappear","All of the water in the frog's tank had evaporated by the time we got home from our weekend away.","To turn from liquid into gas; or to disappear gradually.","The puddles [evaporated] in the sun.","Los charcos se evaporaron con el sol.","My confidence [evaporated] when I saw the exam.","Mi confianza se esfumó cuando vi el examen.","water evaporates; hopes / support evaporate; evaporate quickly","disappear = desaparecer; evaporate = desaparecer poco a poco, como el agua.","Es intransitivo en sentido figurado: ‘my hope evaporated’, no ‘I evaporated my hope’.","Vapor → evaporate: se va como vapor."],
+["exodus","n","/ˈeksədəs/","éxodo, salida masiva","mass departure","There was an exodus of young people on the Monday of spring break.","A situation where a lot of people leave a place at the same time.","There was an [exodus] from the city on Friday afternoon.","Hubo un éxodo de la ciudad el viernes por la tarde.","The [exodus] of doctors left the hospital short of staff.","La salida masiva de médicos dejó al hospital sin personal.","mass exodus; exodus from; exodus of people / workers","departure = salida (general); exodus = salida de mucha gente a la vez.","Normalmente singular con ‘an’: ‘an exodus’, ‘a mass exodus’.","Como el Éxodo de la Biblia: todo un pueblo saliendo."],
+["exquisite","adj","/ɪkˈskwɪzɪt/","exquisito, bellísimo, de gran delicadeza","very beautiful, wonderful","The queen looked exquisite in her royal gown.","Extremely beautiful and delicate.","She wore an [exquisite] silk dress.","Llevaba un vestido de seda exquisito.","The hotel has an [exquisite] view of the lake.","El hotel tiene una vista bellísima del lago.","exquisite taste; exquisite detail; exquisitely beautiful","beautiful = bonito; exquisite = de belleza delicada y refinada. En inglés no se usa tanto para comida como en español.","Nota: en el material aparece como (v), pero es adjetivo (adj). Se acepta /ˈekskwɪzɪt/ también.","Exquisito en español, pero en inglés piensa más en belleza que en sabor."],
+["extricate","v","/ˈekstrɪkeɪt/","sacar, liberar de una situación difícil","free someone from a difficult situation","The car was badly smashed up but he managed to extricate himself.","To get yourself or someone out of a difficult place or situation.","Firefighters [extricated] the driver from the car.","Los bomberos sacaron al conductor del coche.","She couldn't [extricate] herself from the conversation.","No pudo zafarse de la conversación.","extricate yourself from; extricate somebody from; manage to extricate","free = liberar; escape = escapar; extricate = sacar con esfuerzo de algo enredado.","Estructura: extricate somebody/yourself FROM something.","Ex- (fuera) + trica (enredo): salir del enredo."],
+["festoon","v","/feˈstuːn/","engalanar, decorar (con guirnaldas, cintas…)","decorate","The hotel was festooned with streamers and balloons to welcome the celebrities.","To decorate a place with chains of flowers, ribbons, lights, etc.","The street was [festooned] with flags for the parade.","La calle estaba engalanada con banderas para el desfile.","They [festooned] the tree with fairy lights.","Adornaron el árbol con lucecitas.","festooned with lights / flowers / balloons","decorate = decorar (general); festoon = cubrir con muchas guirnaldas colgantes.","Casi siempre en pasiva: ‘be festooned with’.","Festoon suena a ‘fiesta’: decorar para la fiesta."],
+["fetch","v","/fetʃ/","ir a buscar y traer","go and get","If you want the dog to fetch the bone you have to throw it into the ocean.","To go to another place and bring something or someone back.","Can you [fetch] my glasses from the bedroom?","¿Puedes ir a buscarme las gafas al dormitorio?","I'll [fetch] the children from school at four.","Iré a buscar a los niños al colegio a las cuatro.","fetch somebody something; go and fetch; fetch help / water","bring = traer (de allí hacia aquí); fetch = ir allá Y traer, el viaje completo.","‘Fetch’ implica ir y volver. ‘Bring me the book’ no indica que alguien vaya a buscarlo.","El juego del perro: ‘Fetch!’, y el perro va y trae la pelota."],
+["fiddle around","v","/ˈfɪdl əˈraʊnd/","manosear, toquetear, hacer arreglos con las manos","do casual work using one's hands","Ben fiddled around with the wires until he got the computer working again.","To touch or move small things with your hands, trying to fix or adjust them.","He [fiddled around] with the radio until it worked.","Estuvo trasteando con la radio hasta que funcionó.","Stop [fiddling around] with your phone and listen!","¡Deja de toquetear el teléfono y escucha!","fiddle around with something; fiddle with buttons / keys","tinker = trastear para arreglar; fiddle around = toquetear, a veces sin objetivo claro.","Lleva ‘with’: fiddle around WITH the wires.","Fiddle = violín: dedos inquietos tocando cosas."],
+["flock","v","/flɒk/","acudir en masa, ir en tropel","go as a group","The children flocked to the ice cream truck.","When many people go somewhere together because it is attractive.","Tourists [flock] to Paris every summer.","Los turistas acuden en masa a París cada verano.","Fans [flocked] to the stadium to see the final.","Los aficionados fueron en tropel al estadio para ver la final.","flock to; flock in; people flock; a flock of birds / sheep (n)","crowd = aglomerarse; flock = llegar muchos a un sitio atractivo, como pájaros.","Va con ‘to’: flock to the beach. Como sustantivo: a flock of sheep.","Una bandada (flock) de pájaros volando todos al mismo árbol."],
+["forensic evidence","n","/fəˈrensɪk ˈevɪdəns/","pruebas forenses, evidencia científica en la escena de un crimen","scientific proof at a crime scene (for example: blood)","The forensic evidence proved that the murderer was male.","Scientific proof, like blood, DNA or fingerprints, used to solve a crime.","The [forensic evidence] linked the suspect to the crime.","Las pruebas forenses vincularon al sospechoso con el crimen.","Without [forensic evidence], the police couldn't charge him.","Sin pruebas forenses, la policía no pudo acusarlo.","gather / collect forensic evidence; forensic evidence shows / proves","proof = prueba concluyente; evidence = pruebas (incontable).","‘Evidence’ es incontable: ‘some evidence’, ‘a piece of evidence’, nunca ‘evidences’.","Como en CSI: el equipo forense busca evidencia."],
+["frantic","adj","/ˈfræntɪk/","frenético, desesperado y asustado","wild and scared","The people grew frantic as the tornado got closer to the city.","Very worried, scared and acting quickly without control.","She was [frantic] when she couldn't find her child.","Estaba desesperada cuando no encontraba a su hijo.","There was a [frantic] search for the missing keys.","Hubo una búsqueda frenética de las llaves perdidas.","frantic search; frantic with worry; frantic phone calls; go frantic","panicked = en pánico; hectic = ajetreado (sin miedo); frantic = desesperado y acelerado.","‘Frantic’ es emocional (miedo). Para un día muy ocupado usa ‘hectic’.","Frantic suena a ‘frenético’."],
+["frisson","n","/ˈfriːsɒn/","escalofrío (de emoción, miedo o placer)","shiver","When I watched the car accident on the news it sent a frisson up my back.","A sudden, short feeling of excitement or fear.","I felt a [frisson] of excitement as the curtain rose.","Sentí un escalofrío de emoción cuando se levantó el telón.","His words sent a [frisson] of fear through the room.","Sus palabras provocaron un escalofrío de miedo en la sala.","a frisson of excitement / fear / danger","shiver = escalofrío físico (frío); frisson = escalofrío emocional, más literario.","Palabra francesa: /ˈfriːsɒn/, la ‘s’ suena como /s/.","Frisson ≈ ‘frío’: un frío repentino de emoción."],
+["fruitlessly","adv","/ˈfruːtləsli/","infructuosamente, sin éxito","unsuccessfully","The baby fruitlessly pulled at the top of the jar of candy.","Without getting any result, despite effort.","We searched [fruitlessly] for the lost ring.","Buscamos infructuosamente el anillo perdido.","He argued [fruitlessly] with the referee.","Discutió en vano con el árbitro.","search fruitlessly; try fruitlessly","in vain = en vano (más común); unsuccessfully = sin éxito; fruitlessly = sin dar ‘fruto’.","Adjetivo: fruitless (a fruitless search).","Un árbol sin fruta (fruit-less): esfuerzo sin resultado."],
+["gaze","v","/ɡeɪz/","contemplar, mirar fijamente con asombro","stare at with wide eyes","The children gazed at the field of sunflowers.","To look at something for a long time, often with admiration or wonder.","She [gazed] at the stars for hours.","Contempló las estrellas durante horas.","He [gazed] out of the train window, lost in thought.","Miró fijamente por la ventana del tren, perdido en sus pensamientos.","gaze at; gaze into somebody's eyes; gaze out of the window","stare = mirar fijamente (puede ser incómodo); gaze = mirar largo rato con admiración; glance = vistazo.","Lleva ‘at’, ‘into’ o ‘out of’: gaze AT the sea.","Gaze ↔ ‘gaze-lle’: miras embobado una gacela."],
+["germane","adj","/dʒɜːˈmeɪn/","pertinente, relacionado con la situación","related to the situation","At the germane moment the father walked in and heard the baby saying “Dad” for the first time.","Relevant and connected to what is being discussed.","That information is not [germane] to this case.","Esa información no es pertinente para este caso.","Please keep your comments [germane] to the topic.","Por favor, que tus comentarios sean pertinentes al tema.","germane to; not germane","relevant = relevante (común); pertinent = pertinente; germane = formal, casi siempre ‘germane to’.","Se usa con ‘to’: germane TO the discussion. Nota: en el ejemplo del material se usa de forma poco habitual (‘the germane moment’).","Germane ≈ ‘hermano’ (germanus): es ‘hermano’ del tema."],
+["glower","v","/ˈɡlaʊə(r)/","mirar con enfado, fulminar con la mirada","stare angrily","I glowered at the bus driver who closed his doors just as I arrived at the stop.","To look at someone angrily, without speaking.","She [glowered] at me when I laughed.","Me fulminó con la mirada cuando me reí.","The old man [glowered] at the noisy teenagers.","El anciano miró con enfado a los adolescentes ruidosos.","glower at somebody; glower silently","glare = mirar furioso (más intenso y breve); glower = mirada enfadada y sombría, sostenida.","Rima con ‘flower’ /aʊə/. No confundir con ‘glow’ (brillar).","Glower = ‘glow’ + ‘er’: ojos que brillan de rabia."],
+["grandiose","adj","/ˈɡrændiəʊs/","grandioso, pretencioso, demasiado ambicioso","large and impressive","The couple had grandiose dreams about winning the lottery.","Very big and impressive, often too ambitious or showy.","He had [grandiose] plans to build a castle.","Tenía planes grandiosos de construir un castillo.","The [grandiose] building looked out of place in the village.","El edificio pretencioso parecía fuera de lugar en el pueblo.","grandiose plans / ideas / scheme; grandiose building","grand = grande y elegante (positivo); grandiose = exagerado, a menudo con crítica.","Matiz: en inglés suele tener tono negativo (‘demasiado’), a diferencia de ‘grandioso’.","Grand + -iose: tan grande que es exagerado."],
+["graphology","n","/ɡræˈfɒlədʒi/","grafología, estudio de la escritura a mano","the study of handwriting","Police use graphology to tell if a suspect is nervous.","The study of handwriting to learn about someone's personality.","She studied [graphology] to analyse old letters.","Estudió grafología para analizar cartas antiguas.","Some companies use [graphology] when hiring, but scientists doubt it.","Algunas empresas usan la grafología al contratar, pero los científicos dudan de ella.","practise graphology; graphology expert","handwriting analysis = análisis de letra (más simple).","Es incontable: ‘graphology’, sin artículo.","Graph (escribir) + -logy (estudio)."],
+["gratitude","n","/ˈɡrætɪtjuːd/","gratitud, agradecimiento","thankfulness","The students showed their gratitude by sending their retired teacher flowers.","The feeling of being thankful.","I'd like to express my [gratitude] to everyone who helped.","Quiero expresar mi gratitud a todos los que ayudaron.","She cried with [gratitude] when they found her dog.","Lloró de agradecimiento cuando encontraron a su perro.","express gratitude; deep gratitude; out of gratitude; gratitude for something","thanks = gracias (informal); appreciation = aprecio; gratitude = sentimiento de agradecimiento.","Se dice ‘gratitude FOR something’ y ‘gratitude TO somebody’.","Gratitud = gratitude: casi idénticas."],
+["grotesque","adj","/ɡrəʊˈtesk/","grotesco, desagradable de ver","disgusting, hard to look at","The horror movie was so grotesque I had to walk out of the theatre.","Strange and ugly in an unpleasant or shocking way.","The mask had a [grotesque] face with huge teeth.","La máscara tenía una cara grotesca con dientes enormes.","It is [grotesque] that some people waste food while others starve.","Es grotesco que algunos desperdicien comida mientras otros pasan hambre.","grotesque face / figure; grotesque display","ugly = feo; disgusting = asqueroso; grotesque = feo de manera extraña, exagerada o chocante.","Pronunciación: /ɡrəʊˈtesk/, la ‘que’ suena /k/.","Grotesco → grotesque."],
+["grudgingly","adv","/ˈɡrʌdʒɪŋli/","a regañadientes, de mala gana","without wanting to","The child grudgingly took the garbage out for his mom.","Doing something although you don't really want to.","He [grudgingly] agreed to help his brother.","Aceptó a regañadientes ayudar a su hermano.","She [grudgingly] admitted that I was right.","Admitió de mala gana que yo tenía razón.","grudgingly admit / accept / agree","reluctantly = con reticencia (similar); grudgingly = con algo de resentimiento.","Adjetivo: grudging. ‘Hold a grudge’ = guardar rencor.","Grudge = rencor: lo haces con rencor, a regañadientes."],
+["hastily","adv","/ˈheɪstɪli/","precipitadamente, a toda prisa","quickly and with little thought","We packed so hastily that I forgot my bathing suit.","Very quickly, without thinking carefully.","He [hastily] wrote a note and left.","Escribió precipitadamente una nota y se fue.","The meeting was [hastily] arranged after the news.","La reunión se organizó a toda prisa tras la noticia.","hastily arranged / written / prepared; leave hastily","quickly = rápido (neutro); hastily = rápido y sin pensar, con prisas.","Ortografía: haste → hasty → hastily (la ‘y’ cambia a ‘i’).","Haste makes waste: las prisas causan errores."],
+["hawkers","n","/ˈhɔːkəz/","vendedores ambulantes","people who sell goods on the street","I bought this necklace from some hawkers in Amsterdam.","People who walk around selling things in the street.","[Hawkers] sold drinks to people stuck in traffic.","Unos vendedores ambulantes vendían bebidas a la gente atrapada en el tráfico.","The beach was full of [hawkers] selling sunglasses.","La playa estaba llena de vendedores ambulantes de gafas de sol.","street hawkers; hawkers sell; hawkers' stalls","vendor = vendedor (con puesto); tout = insiste y molesta; hawker = vende caminando, gritando su oferta.","Plural ‘hawkers’; verbo ‘to hawk’ = vender pregonando.","Como un halcón (hawk) que vigila a los turistas para venderles algo."],
+["headshrink","n (slang)","/ˈhedʃrɪŋk/","(jerga) psiquiatra, ‘loquero’","(slang) psychiatrist","Annie cries so much I think she might need a headshrink.","An informal, slightly joking word for a psychiatrist.","Maybe you should talk to a [headshrink] about your nightmares.","Quizá deberías hablar con un loquero sobre tus pesadillas.","His [headshrink] told him to take a long holiday.","Su psiquiatra le dijo que se tomara unas largas vacaciones.","see a headshrink; need a headshrink","shrink = forma más común hoy (informal); psychiatrist / therapist = formal.","Es jerga y algo despectivo. Hoy se oye más ‘shrink’.","Head + shrink: el que ‘encoge la cabeza’ (reduce tus problemas)."],
+["heroin","n","/ˈherəʊɪn/","heroína (droga)","strong narcotic drug derived from morphine","People who use heroin often need help getting over their addiction.","A very strong and addictive illegal drug made from morphine.","He spent years fighting a [heroin] addiction.","Pasó años luchando contra una adicción a la heroína.","Police seized two kilos of [heroin] at the port.","La policía incautó dos kilos de heroína en el puerto.","heroin addict; heroin addiction; take / use heroin","Es incontable.","No confundir con ‘heroine’ (heroína, la protagonista): suenan igual pero se escriben distinto.","heroin (sin ‘e’) = droga; heroine (con ‘e’) = la heroína de la historia."],
+["hocus pocus","n (slang)","/ˌhəʊkəs ˈpəʊkəs/","(coloquial) magia, truco; palabrería engañosa","(slang) magic","It was like hocus pocus when the door shut by itself.","Magic tricks or words; also nonsense used to trick people.","The magician said ‘[hocus pocus]’ and the rabbit vanished.","El mago dijo ‘abracadabra’ y el conejo desapareció.","He thinks astrology is just [hocus pocus].","Él cree que la astrología es solo charlatanería.","just hocus pocus; a bit of hocus pocus","abracadabra = palabras mágicas; mumbo-jumbo = palabrería sin sentido (muy cercano).","A veces se escribe ‘hocus-pocus’ con guion.","Las palabras del mago: ‘hocus pocus’ = abracadabra."],
+["homicidal","adj","/ˌhɒmɪˈsaɪdl/","homicida, con tendencia a matar","likely to kill someone","The police were extremely concerned, because the criminal that got away was homicidal.","Dangerous and likely to murder someone.","The film is about a [homicidal] robot.","La película trata de un robot homicida.","He had [homicidal] thoughts after years of abuse.","Tenía pensamientos homicidas después de años de abuso.","homicidal maniac; homicidal tendencies; homicidal rage","murderous = asesino (más común); homicidal = término más técnico, legal o médico.","Sustantivo: homicide (homicidio).","Homicidio → homicidal."],
+["hue","n","/hjuː/","tono, matiz de color","shades of colour","When painting, artists often blend many hues.","A colour or shade of a colour.","The sky turned a pink [hue] at sunset.","El cielo adquirió un tono rosado al atardecer.","Her paintings use every [hue] of blue.","Sus cuadros usan todos los tonos de azul.","a golden / reddish hue; take on a hue; every hue","colour = color (general); shade = tono más claro u oscuro; hue = el tono o matiz, más literario.","Pronunciación: /hjuː/, como ‘hiú’. No suena la ‘e’.","Hue suena a ‘hue-vo’: la yema tiene un hue dorado."],
+["huskiness","n","/ˈhʌskinəs/","ronquera, voz ronca y grave","rough and dry voice","Smokers often speak with a distinct huskiness.","A low, rough quality in someone's voice.","There was a sexy [huskiness] in her voice.","Había una ronquera sensual en su voz.","The [huskiness] in his voice came from shouting at the match.","La ronquera de su voz venía de gritar en el partido.","huskiness in somebody's voice; a slight huskiness","hoarseness = ronquera por enfermedad; huskiness = voz ronca, a menudo atractiva.","Adjetivo: husky (a husky voice). No tiene que ver con el perro husky.","Un perro husky que aúlla ronco: huskiness."],
+["imperative","adj","/ɪmˈperətɪv/","imprescindible, de vital importancia","very important","It is imperative that you wear your seat belt during take-off.","Extremely important and necessary.","It is [imperative] that we leave before the storm.","Es imprescindible que salgamos antes de la tormenta.","Speed is [imperative] in an emergency.","La rapidez es vital en una emergencia.","it is imperative that; absolutely imperative; imperative to do something","important = importante; essential = esencial; imperative = obligatorio, urgente.","Estructura: ‘It is imperative THAT you wear’ (sin ‘to’ después de ‘you’).","Imperativo = una orden: algo que tienes que hacer sí o sí."],
+["impromptu","adj","/ɪmˈprɒmptjuː/","improvisado, sin planear","without being planned","We took an impromptu vacation to Hawaii at Christmas.","Done without planning or preparation.","We had an [impromptu] party in the kitchen.","Hicimos una fiesta improvisada en la cocina.","The singer gave an [impromptu] performance in the street.","El cantante dio una actuación improvisada en la calle.","impromptu speech / party / visit / performance","spontaneous = espontáneo; improvised = improvisado (arreglado sobre la marcha); impromptu = sin planear.","Va delante del sustantivo: an impromptu visit.","Im-prompt-u: ‘pronto’, salió de repente."]
+);
+
+// Vocabulario de "The Metro" — parte 3/4
+W.push(
+["incongruity","n","/ˌɪnkɒŋˈɡruːəti/","incongruencia, algo fuera de lugar","quality of being out of place","The only female felt the incongruity as the men stared at her during her workout.","The quality of not fitting in, or seeming strange in a situation.","The [incongruity] of a man in a suit on the beach made us laugh.","La incongruencia de un hombre de traje en la playa nos hizo reír.","She noticed the [incongruity] between his words and his actions.","Notó la incongruencia entre sus palabras y sus actos.","the incongruity of; incongruity between A and B","contradiction = contradicción (ideas); incongruity = algo que no encaja con el entorno.","Adjetivo: incongruous (fuera de lugar).","In-congru-ity: no ‘congenia’ con lo que lo rodea."],
+["indiscretion","n","/ˌɪndɪˈskreʃn/","indiscreción, desliz (a menudo una aventura sexual)","something, especially a sexual relationship, that might be embarrassing or morally wrong","His indiscretion cost him his marriage.","An action, often a secret affair, that is embarrassing or morally wrong.","The politician apologised for his youthful [indiscretions].","El político pidió disculpas por los deslices de su juventud.","One [indiscretion] at the party ruined her reputation.","Un desliz en la fiesta arruinó su reputación.","youthful indiscretion; a moment of indiscretion; sexual indiscretion","mistake = error (general); affair = aventura amorosa; indiscretion = desliz embarazoso, a veces eufemismo de infidelidad.","Puede ser contable (an indiscretion = un desliz) o incontable (falta de discreción).","Lo contrario de ser discreto: un desliz que todos acaban sabiendo."],
+["insulate","v","/ˈɪnsjuleɪt/","proteger, aislar","protect","The front seat passengers were insulated by the car's air bags.","To protect someone or something from harm, heat, cold or noise.","We [insulated] the roof to keep the house warm.","Aislamos el techo para mantener la casa caliente.","Rich parents can't [insulate] their children from every problem.","Los padres ricos no pueden proteger a sus hijos de todos los problemas.","insulate from / against; well insulated; insulate a house","isolate = aislar (separar de otros); insulate = proteger con una capa (calor, ruido, problemas).","No confundir con ‘isolate’ (aislar a alguien socialmente). ‘Insulate FROM/AGAINST’.","Insula = isla: rodeas algo de protección como una isla."],
+["intently","adv","/ɪnˈtentli/","atentamente, con gran interés","eagerly, with interest","We watched intently as Monica jumped from the airplane.","With complete attention and concentration.","The students listened [intently] to the story.","Los alumnos escucharon atentamente la historia.","The cat watched the bird [intently].","El gato observaba al pájaro con gran atención.","listen / watch / stare intently","carefully = con cuidado; attentively = atentamente; intently = con concentración total.","No confundir con ‘intentionally’ (a propósito).","Intent = intención fija: no apartas la mirada."],
+["intersected","v","/ˌɪntəˈsektɪd/","se cruzaron, se intersecaron","cross paths","The two highways intersected at the downtown core.","Crossed each other at a point (roads, lines or lives).","Our lives [intersected] briefly in Paris.","Nuestras vidas se cruzaron brevemente en París.","The metro lines [intersect] at the central station.","Las líneas de metro se cruzan en la estación central.","roads / lines intersect; intersect with; intersecting streets","cross = cruzar (común); intersect = más técnico (líneas, calles). Sustantivo: intersection = cruce.","Puede usarse con o sin ‘with’: ‘A intersects (with) B’.","Inter (entre) + sect (cortar): dos líneas que se cortan."],
+["irritable","adj","/ˈɪrɪtəbl/","irritable, de mal humor","grumpy","I'm always irritable when it's this hot outside.","Easily annoyed or angry.","He gets [irritable] when he's hungry.","Se pone irritable cuando tiene hambre.","Lack of sleep made her [irritable] all day.","La falta de sueño la puso de mal humor todo el día.","become / get / feel irritable; irritable mood","annoyed = molesto (por algo concreto); irritable = que se molesta fácilmente (estado).","Se pronuncia /ˈɪrɪtəbl/, acento al inicio.","Irritable = irritable: idéntica."],
+["jaded","adj","/ˈdʒeɪdɪd/","hastiado, cansado de algo por exceso","tired or lacking enthusiasm after having too much of something","The jaded playboy had completely lost interest in women.","Tired and bored because you have had too much of something.","After years of travelling, she was [jaded] by airports.","Después de años viajando, estaba hastiada de los aeropuertos.","[Jaded] critics found the film boring.","Los críticos hastiados encontraron la película aburrida.","jaded palate; jaded by / with; feel jaded","bored = aburrido; tired = cansado; jaded = harto por exceso, sin entusiasmo.","Usa ‘jaded by / with’ algo.","Tanto jade (piedra) que ya no te emociona verlo."],
+["lash","v","/læʃ/","golpear con violencia, azotar","hit violently","Mark got stung after he lashed at the bee in his hair.","To hit hard and suddenly; or to move violently.","Rain [lashed] the windows all night.","La lluvia azotó las ventanas toda la noche.","The angry cat [lashed] out at the dog.","El gato enfadado arremetió contra el perro.","lash out at; rain lashes; lash somebody with a whip","hit = golpear (general); whip = azotar con látigo; lash = golpe repentino y violento.","‘Lash out (at)’ = arremeter, también verbalmente. Sustantivo: eyelash = pestaña.","El latigazo (lash) de un látigo."],
+["lead","n","/liːd/","pista (para resolver un crimen)","clue to solving a crime","We don't have any leads except that the thief is driving a brown car.","A piece of information that helps solve a crime or problem.","The detective followed a new [lead].","El detective siguió una nueva pista.","Police have no [leads] in the robbery case.","La policía no tiene pistas en el caso del robo.","follow a lead; a promising lead; have no leads","clue = pista (general, también en juegos); lead = pista que te ‘lleva’ a investigar.","Pronunciación: /liːd/ (como ‘leed’). /led/ es el metal plomo.","Lead = guiar: la pista te lleva (leads) al culpable."],
+["legible","adj","/ˈledʒəbl/","legible","readable","The photocopy of my driver's license is barely legible.","Clear enough to be read.","Please write your name in [legible] letters.","Por favor, escribe tu nombre con letra legible.","The old sign was barely [legible].","El viejo letrero apenas era legible.","barely legible; clearly legible; legible handwriting","readable = legible y también ‘ameno de leer’; legible = solo que se puede descifrar.","Contrario: illegible (ilegible).","Legible = legible: idéntica."],
+["line","n","/laɪn/","línea (de metro o subte)","a route on a subway or metro","I took the wrong subway line so I was late for my date.","A route of a metro, subway or train.","Take the red [line] to the airport.","Toma la línea roja hasta el aeropuerto.","This [line] is closed for repairs at the weekend.","Esta línea está cerrada por reparaciones el fin de semana.","metro / subway / tube line; change lines; the end of the line","route = ruta (bus, general); line = línea fija de metro o tren.","Se dice ‘take the line’, ‘change lines’, no ‘change of line’.","El mapa del metro: cada color es una ‘line’."],
+["lovelorn","adj","/ˈlʌvlɔːn/","que sufre por un amor no correspondido","sad because one is not loved back by another","The lovelorn man wrote 100 letters to his sweetheart but never got one in return.","Sad because the person you love does not love you.","The song is about a [lovelorn] teenager.","La canción trata de un adolescente que sufre por amor.","He wandered the streets, [lovelorn] and alone.","Vagaba por las calles, sufriendo por amor y solo.","lovelorn teenager / poet / letters","heartbroken = con el corazón roto (tras perder un amor); lovelorn = amor no correspondido.","Es literario. No existe ‘lovelorned’.","Love + forlorn (abandonado): abandonado por el amor."],
+["mahogany","adj","/məˈhɒɡəni/","de caoba, color caoba","reddish coloured wood","The mahogany bookshelf doesn't go with the maple furniture.","Made of mahogany, a hard reddish-brown wood; or that colour.","They ate at a long [mahogany] table.","Comieron en una larga mesa de caoba.","She has beautiful [mahogany] hair.","Tiene un precioso pelo color caoba.","mahogany table / desk / furniture; mahogany brown","Como sustantivo, mahogany = la madera de caoba.","Pronunciación: /məˈhɒɡəni/ ‘ma-JÓ-ga-ni’.","Ma-hog-any: muebles caros de caoba."],
+["manicured","adj","/ˈmænɪkjʊəd/","impecable, muy cuidado (uñas, jardín)","well kept","My manicured nails would get ruined if we didn't have a dishwasher.","Neatly cut and carefully looked after (nails, lawns, gardens).","The hotel had perfectly [manicured] gardens.","El hotel tenía jardines perfectamente cuidados.","Her [manicured] hands had bright red nails.","Sus manos cuidadas tenían uñas rojo intenso.","manicured lawn / garden / nails / hands","neat = ordenado; well-kept = bien cuidado; manicured = cuidado al milímetro.","Se usa también para jardines, no solo uñas.","Una manicura perfecta, pero para todo."],
+["memorabilia","n","/ˌmemərəˈbɪliə/","recuerdos, objetos de colección","things you buy that remind you of somewhere (for example: hats, postcards, magnets)","They sell lots of 1950's memorabilia in the front lobby of the diner.","Objects collected because they are connected with a famous person, event or place.","His room is full of football [memorabilia].","Su habitación está llena de recuerdos de fútbol.","The museum shop sells Beatles [memorabilia].","La tienda del museo vende objetos de colección de los Beatles.","sports memorabilia; Elvis memorabilia; collect memorabilia","souvenir = un recuerdo comprado en un viaje; memorabilia = objetos coleccionables (plural colectivo).","Es incontable/plural colectivo: ‘some memorabilia’, no ‘a memorabilia’.","Memoria + -bilia: cosas para recordar."],
+["meticulous","adj","/məˈtɪkjələs/","meticuloso, minucioso","precise, perfect","My father is meticulous when it comes to balancing his finances.","Very careful about every small detail.","She keeps [meticulous] records of her spending.","Lleva un registro meticuloso de sus gastos.","The surgeon is [meticulous] about hygiene.","El cirujano es minucioso con la higiene.","meticulous attention to detail; meticulous planning; meticulous about","careful = cuidadoso; thorough = exhaustivo; meticulous = obsesivo con los detalles.","Lleva ‘about’ o ‘in’: meticulous about / in his work.","Meticuloso = meticulous."],
+["monotone","n","/ˈmɒnətəʊn/","tono monótono, voz sin variación","sound with no change in pitch","My science teacher is so boring because he speaks in a monotone.","A voice or sound that stays on one note, without rising or falling.","He read the list in a flat [monotone].","Leyó la lista con un tono monótono.","Her [monotone] made the lecture hard to follow.","Su voz monótona hacía difícil seguir la clase.","speak in a monotone; a flat monotone","monotonous = adjetivo, ‘aburrido y repetitivo’; monotone = el sonido en un solo tono.","‘Speak IN a monotone’ (con artículo).","Mono (uno) + tone (tono): un solo tono."],
+["mumbo-jumbo","n (slang)","/ˌmʌmbəʊ ˈdʒʌmbəʊ/","palabrería, tonterías, jerga incomprensible","(slang) nonsense","Most parenting books tell you a bunch of mumbo-jumbo about how you should raise your kids.","Language or rituals that sound important but make no sense.","The contract was full of legal [mumbo-jumbo].","El contrato estaba lleno de palabrería legal.","I don't believe in that spiritual [mumbo-jumbo].","No creo en esas tonterías espirituales.","a load of mumbo-jumbo; legal / scientific mumbo-jumbo","nonsense = tonterías (general); jargon = jerga técnica; mumbo-jumbo = palabrería que suena seria pero es vacía.","Es incontable: ‘a lot of mumbo-jumbo’.","Suena a palabras inventadas: mumbo-jumbo = blablablá."],
+["nonchalant","adj","/ˈnɒnʃələnt/","despreocupado, indiferente","casual","The driver was pretty nonchalant about the accident even though his car was destroyed.","Calm and relaxed, as if you don't care or aren't worried.","She gave a [nonchalant] shrug.","Se encogió de hombros con indiferencia.","He was [nonchalant] about losing his job.","Se mostró despreocupado por haber perdido su trabajo.","nonchalant attitude / shrug; nonchalant about","calm = tranquilo; relaxed = relajado; nonchalant = parece no importarle, a veces fingido.","Lleva ‘about’: nonchalant about something.","Non + chaleur (calor, francés): sin calentarse por nada."],
+["nominal","adj","/ˈnɒmɪnl/","simbólico, mínimo (cantidad de dinero)","(of money) small amount, a token","There is just a nominal fee to cover the cost of coffee and sandwiches.","Very small; much less than the real value.","We charge a [nominal] fee for the course.","Cobramos una tarifa simbólica por el curso.","He sold the house to his son for a [nominal] sum.","Le vendió la casa a su hijo por una suma simbólica.","nominal fee / charge / sum / rent","small = pequeño; token = simbólico; nominal = tan pequeño que es solo formal.","También significa ‘solo de nombre’ (the nominal leader). En la lectura es sobre dinero.","Nominal: el precio existe solo de nombre."],
+["papers","n","/ˈpeɪpəz/","papeles, documentos de inmigración","(informal) immigration forms that legalize a person to work or stay in another country","Migel was living in America without his papers so he wasn't able to find legal work.","Official documents that allow someone to live or work in a country.","He finally got his [papers] after five years.","Por fin consiguió sus papeles después de cinco años.","Without [papers], she couldn't open a bank account.","Sin papeles, no podía abrir una cuenta bancaria.","get your papers; without papers; immigration papers; papers in order","documents = documentos (formal); visa = visado; papers = coloquial, como ‘tener papeles’.","En este sentido siempre en plural: ‘papers’.","Como en español: ‘estar sin papeles’."],
+["pique","v","/piːk/","molestar, irritar, ofender","irritate","The drivers were piqued by the way the cyclist slowed down the traffic.","To annoy someone or hurt their pride.","She was [piqued] that nobody noticed her new haircut.","Le molestó que nadie notara su nuevo corte de pelo.","His rude comment [piqued] the guests.","Su comentario grosero irritó a los invitados.","be piqued by / at; in a fit of pique (n)","annoy = molestar (común); offend = ofender; pique = herir el orgullo, molestia leve.","‘Pique somebody's curiosity / interest’ es otro uso: despertar el interés. Pronunciación /piːk/ como ‘peak’.","Te ‘pica’ el orgullo: pique."],
+["placid","adj","/ˈplæsɪd/","plácido, tranquilo","calm","The placid woman sang a song in the elevator until the power was restored.","Calm and not easily upset.","The baby was [placid] and rarely cried.","El bebé era tranquilo y casi nunca lloraba.","We swam in the [placid] waters of the lake.","Nadamos en las aguas plácidas del lago.","placid lake / water / nature; placid temperament","calm = tranquilo (general); peaceful = pacífico; placid = de naturaleza tranquila, difícil de alterar.","Se usa para personas, animales y agua.","Plácido = placid."],
+["plaque","n","/plæk/","placa conmemorativa","a flat ornament on which celebratory or memorializing words are written","Each member on the baseball team got a plaque for coming in second place.","A flat piece of metal, wood or stone with writing on it, to remember someone or an event.","A [plaque] marks the house where the poet was born.","Una placa señala la casa donde nació el poeta.","She received a [plaque] for twenty years of service.","Recibió una placa por veinte años de servicio.","commemorative plaque; unveil a plaque; a plaque in memory of","sign = letrero; trophy = trofeo; plaque = placa plana con inscripción.","Pronunciación: /plæk/ o /plɑːk/. También significa ‘placa dental’.","Plaque = placa."],
+["poignant","adj","/ˈpɔɪnjənt/","conmovedor, emotivo (con algo de tristeza)","emotionally moving","The movie was so poignant I cried at the end.","Making you feel sad or emotional in a deep way.","It was a [poignant] moment when the soldier hugged his daughter.","Fue un momento conmovedor cuando el soldado abrazó a su hija.","The letter is a [poignant] reminder of the war.","La carta es un recuerdo conmovedor de la guerra.","poignant moment / reminder / story / scene","moving = conmovedor (general); touching = enternecedor; poignant = conmovedor con tristeza o nostalgia.","Pronunciación: la ‘g’ no suena: /ˈpɔɪnjənt/.","Poignant ‘pincha’ (poign- = punzante) el corazón."],
+["precision","n","/prɪˈsɪʒn/","precisión, exactitud","perfect accuracy","Janice paints her nails with such precision it looks like she gets them done professionally.","The quality of being exact and accurate.","The watch is made with Swiss [precision].","El reloj está hecho con precisión suiza.","Surgeons must work with great [precision].","Los cirujanos deben trabajar con gran precisión.","with precision; great precision; precision instruments","accuracy = exactitud (resultado correcto); precision = exactitud fina, al detalle.","Adjetivo: precise. ‘With precision’, no ‘with precise’.","Precisión = precision."],
+["preposterous","adj","/prɪˈpɒstərəs/","absurdo, ridículo","ridiculous, impossible to be true","It was preposterous that the fourteen year old needed a babysitter.","So silly or unreasonable that it is shocking or funny.","That's a [preposterous] excuse for being late!","¡Esa es una excusa absurda para llegar tarde!","The idea of a flying car seemed [preposterous] in 1900.","La idea de un coche volador parecía ridícula en 1900.","preposterous idea / claim / suggestion; absolutely preposterous","ridiculous = ridículo; absurd = absurdo; preposterous = absurdo hasta el escándalo.","No es ‘prepóstero’; no tiene equivalente directo.","Pre (antes) + post (después): poner lo de antes después, ¡absurdo!"],
+["prowl","v","/praʊl/","merodear, rondar sigilosamente","move about and search stealthily","The thief was prowling through our jewellery box when we got home.","To move around quietly, often looking for something to steal or hunt.","A fox [prowled] around the chicken house.","Un zorro merodeaba alrededor del gallinero.","Someone was [prowling] in the garden last night.","Alguien rondaba por el jardín anoche.","prowl around / about; on the prowl; prowl the streets","wander = deambular sin rumbo; sneak = moverse a escondidas; prowl = merodear buscando una presa.","‘On the prowl’ = al acecho (también para quien busca pareja).","Como un gato acechando (prowling) a su presa."],
+["publicity card","n","/pʌbˈlɪsəti kɑːd/","tarjeta de presentación publicitaria","small piece of paper (business card) that advertises your career or title","My publicity card has my picture and my company's email address on it.","A small card that advertises a person or business.","The magician handed out [publicity cards] after the show.","El mago repartió tarjetas publicitarias después del espectáculo.","Her [publicity card] showed her phone number and website.","Su tarjeta publicitaria mostraba su número de teléfono y su sitio web.","hand out publicity cards","business card = tarjeta de visita (más común); flyer = volante.","Hoy se dice más ‘business card’.","Publicidad + carta: tarjeta para darte publicidad."],
+["rapport","n","/ræˈpɔː(r)/","buena relación, sintonía","relationship","I have a good rapport with my boss, so I'm not afraid to ask for vacation time.","A friendly relationship where people understand each other well.","The teacher has a great [rapport] with her students.","La profesora tiene una gran sintonía con sus alumnos.","It takes time to build [rapport] with new clients.","Lleva tiempo crear una buena relación con clientes nuevos.","build / establish rapport; good rapport with; develop a rapport","relationship = relación (general); rapport = conexión positiva y fluida.","La ‘t’ final no suena: /ræˈpɔː/. Se dice ‘rapport WITH somebody’.","Rapport ≈ ‘apport’: lo que se aportan mutuamente."],
+["recoil","v","/rɪˈkɔɪl/","retroceder, echarse atrás (por miedo o asco)","move back in fear","I can't help but recoil when they show operations on television.","To move back suddenly because something frightens or disgusts you.","She [recoiled] when she saw the snake.","Retrocedió cuando vio la serpiente.","He [recoiled] from the smell of rotten fish.","Se echó atrás por el olor a pescado podrido.","recoil in horror / disgust; recoil from","flinch = estremecerse; back away = alejarse poco a poco; recoil = salto rápido hacia atrás.","Se usa ‘recoil FROM’ algo o ‘recoil in horror’. También es el retroceso de un arma.","Re- (atrás) + coil (enrollarse): te enroscas hacia atrás."],
+["reconcile","v","/ˈrekənsaɪl/","conciliar, cuadrar (cuentas)","settle or reorganize (finances)","I reconciled my loans and savings accounts after getting my inheritance.","To make financial records agree; or to make people friends again.","I [reconcile] my bank account at the end of each month.","Concilio mi cuenta bancaria a fin de cada mes.","After years of silence, the brothers finally [reconciled].","Tras años de silencio, los hermanos por fin se reconciliaron.","reconcile accounts; reconcile with somebody; reconcile A with B; be reconciled","settle = saldar; balance = cuadrar; reconcile = hacer que dos registros coincidan, o reconciliar a personas.","En el texto el sentido es financiero. ‘Reconcile yourself TO something’ = resignarse.","Re-conciliar: volver a poner de acuerdo números o personas."],
+["resignation","n","/ˌrezɪɡˈneɪʃn/","dimisión, renuncia (a un trabajo)","the giving up of a job","The president of the company offered his resignation after he found out his illness was very serious.","The act of leaving your job officially.","She handed in her [resignation] on Monday.","Presentó su renuncia el lunes.","The scandal led to the minister's [resignation].","El escándalo llevó a la dimisión del ministro.","hand in / offer / announce your resignation; letter of resignation","retirement = jubilación; dismissal = despido; resignation = renuncia voluntaria.","También significa ‘resignación’ (aceptar algo malo), pero aquí es renuncia. Verbo: resign /rɪˈzaɪn/.","Re-sign: firmas (sign) tu salida."]
+);
+
+// Vocabulario de "The Metro" — parte 4/4
+W.push(
+["revelries","n","/ˈrevlriz/","juergas, festejos ruidosos","good times, festivities","Our New Year's Eve revelries kept the neighbours awake until 5:00 am.","Noisy celebrations with dancing, drinking and fun.","The [revelries] went on until dawn.","Los festejos continuaron hasta el amanecer.","The town prepared for the carnival [revelries].","El pueblo se preparó para las juergas del carnaval.","late-night revelries; carnival / New Year revelries","party = fiesta; celebrations = celebraciones; revelry = juerga ruidosa (literario).","Singular incontable ‘revelry’ es más común; plural ‘revelries’ para varios festejos.","Revel = disfrutar a lo grande: revelries."],
+["ridicule","v","/ˈrɪdɪkjuːl/","ridiculizar, burlarse de","made fun of","Leslie ridiculed her brother for always wearing mismatching socks.","To laugh at someone or something in an unkind way.","They [ridiculed] his idea, but it made him rich.","Ridiculizaron su idea, pero lo hizo rico.","Don't [ridicule] people for their accent.","No te burles de la gente por su acento.","ridicule somebody for something; be ridiculed; publicly ridicule","make fun of = burlarse (común); mock = burlarse imitando; ridicule = humillar con burlas.","Nota: la definición del material dice ‘made fun of’; como verbo base es ‘make fun of’. Estructura: ridicule somebody FOR something.","Ridículo → ridicule: hacer quedar ridículo a alguien."],
+["sanctity","n","/ˈsæŋktəti/","santidad, carácter sagrado o puro","holiness, purity","The sanctity of the church was questioned after the minister was arrested.","The quality of being holy or extremely important and respected.","They believe in the [sanctity] of marriage.","Creen en el carácter sagrado del matrimonio.","Doctors must respect the [sanctity] of life.","Los médicos deben respetar la santidad de la vida.","the sanctity of life / marriage / the home","holiness = santidad religiosa; sanctity = sagrado o inviolable, también fuera de la religión.","Casi siempre ‘the sanctity OF something’.","Sanct- como ‘santo’."],
+["save for","prep","/seɪv fɔː(r)/","excepto, salvo","except for","All of the girls at the party were wearing dresses save for Andrea, who always wears jeans.","Except; apart from.","The room was empty [save for] an old chair.","La habitación estaba vacía salvo por una silla vieja.","Everyone passed the test [save for] Tom.","Todos aprobaron el examen excepto Tom.","save for; all save one","except (for) = excepto (común); apart from = aparte de; save for = formal y literario.","No tiene que ver con ‘save’ (guardar o ahorrar). Es formal; en conversación usa ‘except’.","‘Salvo’ en español ≈ ‘save’: todos se salvan, salvo uno."],
+["severing","n","/ˈsevərɪŋ/","corte, separación (cortar algo por completo)","the cutting off of","The severing of his own arm was what saved the climber's life.","The act of cutting something off completely.","The [severing] of the cable caused a blackout.","El corte del cable provocó un apagón.","The [severing] of ties with the company was painful.","La ruptura de vínculos con la empresa fue dolorosa.","the severing of ties / relations; sever a nerve / cable (v)","cutting = corte (general); severing = corte total y definitivo.","Verbo: sever /ˈsevə/. ‘Sever ties’ = romper relaciones.","Sever ≈ severo: un corte severo y definitivo."],
+["shrine","n","/ʃraɪn/","santuario, lugar dedicado a alguien venerado","a place dedicated to a religious or important figure","My aunt's bedroom is like an Elvis Presley shrine.","A holy place, or a place full of objects honouring someone special.","Pilgrims visited the [shrine] every year.","Los peregrinos visitaban el santuario cada año.","His bedroom is a [shrine] to his favourite footballer.","Su habitación es un santuario dedicado a su futbolista favorito.","a shrine to somebody; visit a shrine; roadside shrine","temple = templo (edificio grande); shrine = santuario, a menudo pequeño o dedicado a una persona.","Usa ‘a shrine TO somebody’.","Shrine suena a ‘shine’: un lugar que brilla de devoción."],
+["sob","v","/sɒb/","sollozar, llorar desconsoladamente","cry loudly","We were all sobbing at Angelica's farewell party.","To cry loudly with short breaths.","The little boy [sobbed] when his balloon flew away.","El niño sollozó cuando su globo salió volando.","She was [sobbing] on the phone after the news.","Sollozaba al teléfono después de la noticia.","sob uncontrollably; sob your heart out; sob story (n)","cry = llorar (general); weep = llorar (literario, en silencio); sob = llorar con sollozos.","Doble ‘b’: sobbed, sobbing. ‘Sob story’ = historia lacrimógena para dar pena.","‘Sob’ es corto como un sollozo: ¡sob!"],
+["splay","v","/spleɪ/","extender, abrir (brazos, piernas o dedos)","spread wide apart","The woman's arms were splayed out as her husband stepped off the plane.","To spread arms, legs or fingers wide apart.","He lay on the bed with his arms [splayed] out.","Estaba tumbado en la cama con los brazos extendidos.","The puppy [splayed] its legs on the slippery floor.","El cachorro abrió las patas en el suelo resbaladizo.","splay out; splayed fingers / legs","spread = extender (general); splay = abrir mucho y hacia afuera.","Casi siempre ‘splay out’ o participio ‘splayed’.","Splay = spread + play: te abres jugando en la cama."],
+["stern","adj","/stɜːn/","estricto, severo","strict","My grandfather was so stern that we had to eat every crumb on our dinner plate before we got up from the table.","Serious and strict, expecting to be obeyed.","The teacher gave us a [stern] look.","La profesora nos lanzó una mirada severa.","She received a [stern] warning from the judge.","Recibió una advertencia severa del juez.","stern look / warning / voice; stern face","strict = estricto (reglas); stern = severo en la expresión o el tono.","Como sustantivo, ‘stern’ es la popa de un barco (otro significado).","Stern ≈ ‘estern’: un padre de cara seria como piedra."],
+["stir","v","/stɜː(r)/","moverse ligeramente (al dormir), desperezarse","move in one's sleep, wake slightly","The child stirred when the phone rang but thankfully went back to sleep.","To move a little, especially when sleeping or waking up.","The baby [stirred] but didn't wake up.","El bebé se movió un poco, pero no se despertó.","Nobody was [stirring] in the house at 6 a.m.","Nadie se movía en la casa a las 6 de la mañana.","stir in your sleep; begin to stir; not a creature was stirring","move = moverse (general); wake = despertar; stir = moverse levemente, empezar a despertar.","También significa ‘remover’ (stir the soup). Doble ‘r’: stirred, stirring.","Como remover un café: algo se agita un poquito."],
+["straddle","v","/ˈstrædl/","estar a horcajadas, a ambos lados de algo","stand on both sides","When I went travelling, I often straddled borders for photographs.","To have one leg or part on each side of something.","He [straddled] the bike and rode off.","Se subió a horcajadas a la bici y se fue.","The town [straddles] the border between two countries.","El pueblo se extiende a ambos lados de la frontera entre dos países.","straddle a horse / bike / chair; straddle the border / line","sit on = sentarse en; straddle = con una pierna a cada lado.","Lleva objeto directo: straddle the fence (sin ‘on’).","Straddle ≈ ‘saddle’ (montura): una pierna a cada lado."],
+["stun","v","/stʌn/","dejar atónito, sorprender mucho","surprise","I was stunned when my best friend told me she was moving to the other side of the world.","To shock or surprise someone so much they can't react.","The news [stunned] the whole country.","La noticia dejó atónito a todo el país.","I was [stunned] by her beauty.","Me quedé deslumbrado por su belleza.","be stunned by; stunned silence; stun gun","surprise = sorprender (general); shock = conmocionar; stun = dejar paralizado de sorpresa.","Doble ‘n’: stunned, stunning. Adjetivo ‘stunning’ = impresionante, bellísimo.","Una pistola paralizante (stun gun): te deja inmóvil."],
+["succulent","adj","/ˈsʌkjələnt/","suculento, jugoso","thick/juicy","The succulent watermelon was exactly what we needed on such a hot summer day.","Juicy and delicious.","We ate [succulent] roast chicken.","Comimos un pollo asado suculento.","The [succulent] peaches dripped with juice.","Los melocotones jugosos chorreaban jugo.","succulent meat / fruit / steak","juicy = jugoso (común); tasty = sabroso; succulent = jugoso y apetitoso. También ‘succulent’ = planta suculenta.","Pronunciación: /ˈsʌkjələnt/ ‘SÁ-kiu-lent’.","Suculento = succulent."],
+["sullenly","adv","/ˈsʌlənli/","de mal humor, con hosquedad","sulkily, unhappily","The dog stood sullenly beside our suitcases before we left for our vacation.","In a bad-tempered, silent and unfriendly way.","The teenager sat [sullenly] at the table.","El adolescente se sentó de mal humor a la mesa.","He stared [sullenly] at the floor and said nothing.","Miraba hoscamente al suelo sin decir nada.","sit / stare / reply sullenly","sadly = con tristeza; grumpily = gruñón; sullenly = enfurruñado y en silencio.","Adjetivo: sullen. No confundir con ‘sudden’.","Sullen suena a ‘solo’: enfurruñado y callado en un rincón."],
+["sweltering","adj","/ˈsweltərɪŋ/","sofocante, de calor agobiante","very hot and humid","The bus was sweltering because there was no air conditioning.","Uncomfortably hot and humid.","It was a [sweltering] day in July.","Fue un día sofocante de julio.","The metro was [sweltering] in the summer heat.","El metro era sofocante con el calor del verano.","sweltering heat; sweltering day; sweltering conditions","hot = caliente; humid = húmedo; sweltering = calor húmedo insoportable.","Se usa para el clima y lugares, no para objetos (no ‘a sweltering cup’).","Sweat (sudar) + sweltering: sudas a mares."],
+["tawdry","adj","/ˈtɔːdri/","de mal gusto, chabacano, barato","cheap, of fake appearance","The hostess was wearing a tawdry pearl necklace that looked like it came out of a cereal box.","Cheap, showy and of poor quality.","The shop sold [tawdry] souvenirs.","La tienda vendía recuerdos de mal gusto.","It was a [tawdry] little hotel near the station.","Era un hotelucho chabacano cerca de la estación.","tawdry jewellery / decorations; tawdry affair","cheap = barato; tacky = hortera, de mal gusto (informal); tawdry = barato y vistoso, también moralmente sórdido.","También se usa para historias o escándalos ‘sórdidos’ (a tawdry affair).","Tawdry suena a ‘todo de rastro’: baratijas brillantes."],
+["tenement","n","/ˈtenəmənt/","casa de vecindad, edificio dividido en viviendas","a house divided into separate residences","Our salon is in a tenement building until we can buy our own place.","A large old building divided into many small flats, often in a poor area.","They grew up in a crowded [tenement] in New York.","Crecieron en una casa de vecindad abarrotada en Nueva York.","The old [tenement] was turned into modern flats.","La vieja casa de vecindad se convirtió en departamentos modernos.","tenement building / block / flat","apartment block = bloque de departamentos (neutro); tenement = edificio viejo, a menudo pobre.","Nota: en el material aparece como (adj); es sustantivo, aunque se usa delante de otro sustantivo (‘tenement building’).","Tenement ↔ ‘tenant’ (inquilino): edificio lleno de inquilinos."],
+["terminate","v","/ˈtɜːmɪneɪt/","terminar, poner fin a, rescindir","put an end to","I tried to terminate my magazine subscription but they keep sending me new issues.","To end something officially.","They [terminated] his contract after two months.","Le rescindieron el contrato a los dos meses.","This train [terminates] at the next station.","Este tren termina su recorrido en la próxima estación.","terminate a contract / agreement / subscription; train terminates at","end = terminar (común); cancel = cancelar; terminate = terminar formalmente.","Es formal. Para cosas cotidianas usa ‘end’ o ‘finish’.","Terminal del metro: donde la línea termina (terminates)."],
+["thrust","v","/θrʌst/","empujar o meter con fuerza","push or give forcibly","Eric thrust Mia into the pool because she was taking so long to go in.","To push something or someone suddenly and with force.","She [thrust] the letter into my hand.","Me metió la carta en la mano de golpe.","He [thrust] his way through the crowd.","Se abrió paso a empujones entre la multitud.","thrust something into / at somebody; thrust your way through","push = empujar (general); shove = empujar bruscamente; thrust = empujar con fuerza y de golpe.","Verbo irregular sin cambio: thrust – thrust – thrust (no ‘thrusted’).","Thrust suena a ‘trust’: no confíes, te empuja."],
+["tolerable","adj","/ˈtɒlərəbl/","tolerable, soportable apenas","just barely able to accept","I can't stand talking to the man next door, but his wife is tolerable.","Acceptable but not very good; possible to bear.","The pain was [tolerable] after the medicine.","El dolor era soportable después de la medicina.","The food was [tolerable], but nothing special.","La comida era pasable, pero nada especial.","barely tolerable; tolerable level; just about tolerable","acceptable = aceptable; bearable = soportable; tolerable = aguantable, sin entusiasmo.","No es un cumplido: ‘tolerable’ suena a ‘regular tirando a mal’.","Tolerar → tolerable."],
+["tout","n","/taʊt/","vendedor insistente, revendedor","person who bothers you to buy something","The touts on the street pressured us to buy their perfumes and colognes.","A person who persistently tries to sell you something, often tickets.","A ticket [tout] offered us seats for three times the price.","Un revendedor nos ofreció entradas al triple de precio.","[Touts] waited outside the station for tourists.","Los vendedores insistentes esperaban a los turistas fuera de la estación.","ticket tout; taxi touts; avoid touts","hawker = vendedor ambulante; tout = insiste y presiona, a veces revende entradas (scalper en EE. UU.).","Pronunciación: /taʊt/ ‘taut’. Como verbo, ‘tout’ = promocionar con insistencia.","Tout suena a ‘to out’: te persigue hasta afuera."],
+["trifle","n","/ˈtraɪfl/","nimiedad, cantidad muy pequeña","a very small amount","This year's Christmas bonus was a trifle compared to last year's.","Something small or unimportant; a small amount.","The repair cost a [trifle] compared to a new car.","El arreglo costó una nimiedad comparado con un coche nuevo.","Don't worry about such a [trifle].","No te preocupes por semejante nimiedad.","a trifle (= a little: a trifle tired); mere trifle","‘a trifle’ + adjetivo = un poco (a trifle cold). También es un postre británico.","‘A trifle’ delante de adjetivo es adverbial: ‘a trifle nervous’.","Trifle: tan poco que es una tontería."],
+["turmoil","n","/ˈtɜːmɔɪl/","agitación, caos, confusión","great uncertainty and confusion","Everyone is quitting because there is so much turmoil with our new boss.","A state of great confusion, worry or disorder.","The country was in political [turmoil].","El país estaba en plena agitación política.","Her mind was in [turmoil] after the breakup.","Su mente era un caos después de la ruptura.","in turmoil; political / emotional turmoil; throw into turmoil","chaos = caos; confusion = confusión; turmoil = agitación intensa y prolongada.","Va con ‘in’: be in turmoil. Incontable.","Turmoil ≈ ‘tormenta’ + ‘boil’ (hervir)."],
+["turnstile","n","/ˈtɜːnstaɪl/","torniquete (de entrada)","entrance with revolving metal arms","You pay for the subway at the turnstiles.","A gate with turning bars that lets one person through at a time.","Put your ticket in the [turnstile] to enter the metro.","Mete el billete en el torniquete para entrar al metro.","He jumped over the [turnstile] without paying.","Saltó el torniquete sin pagar.","go through the turnstile; jump the turnstile","gate = puerta o barrera; barrier = barrera; turnstile = torniquete giratorio.","Es contable: a turnstile, the turnstiles.","Turn (girar) + stile (paso): un paso que gira."],
+["uncanny","adj","/ʌnˈkæni/","asombroso, inexplicable, extraño","difficult to explain","It was uncanny how much the child looked like his adopted mother.","Strange and difficult to explain, sometimes a little scary.","She has an [uncanny] ability to guess what I'm thinking.","Tiene una habilidad asombrosa para adivinar lo que pienso.","There's an [uncanny] silence in the empty station.","Hay un silencio extraño en la estación vacía.","uncanny resemblance / ability / accuracy","strange = raro; eerie = inquietante; uncanny = raro y difícil de explicar, a menudo con admiración.","‘An uncanny resemblance’ es la colocación más típica.","Un-canny: algo que ‘no se puede’ (can't) explicar."],
+["unfaithful","adj","/ʌnˈfeɪθfl/","infiel","not keeping a promise to only have one sexual partner","Mrs. Jones divorced her husband when she learned that he was being unfaithful to her.","Having a sexual relationship with someone who is not your partner.","He was [unfaithful] to his wife for years.","Le fue infiel a su esposa durante años.","She left him after discovering he had been [unfaithful].","Lo dejó tras descubrir que había sido infiel.","be unfaithful to somebody; unfaithful husband / wife","cheat (on) = engañar (informal); unfaithful = infiel (neutro).","Se dice ‘unfaithful TO somebody’, no ‘with’ (with = con la otra persona).","Un-faith-ful: sin fidelidad."],
+["upholstered","adj","/ʌpˈhəʊlstəd/","tapizado","covered with thick material","My grandfather's upholstered chair needs to be vacuumed.","Covered with soft padding and fabric (furniture).","We bought an [upholstered] armchair for the living room.","Compramos un sillón tapizado para el salón.","The seats were [upholstered] in red velvet.","Los asientos estaban tapizados en terciopelo rojo.","upholstered in leather / velvet; upholstered chair / sofa","padded = acolchado; cushioned = con cojín; upholstered = tapizado (con tela y relleno).","Se usa ‘upholstered IN’ + material.","Up + hold: la tela ‘sostiene’ el relleno arriba."],
+["vaguely","adv","/ˈveɪɡli/","vagamente, de forma poco clara","not clearly","I vaguely remember meeting you many years ago.","In a way that is not clear or detailed.","I [vaguely] remember my first day at school.","Recuerdo vagamente mi primer día de colegio.","He waved [vaguely] towards the exit.","Hizo un gesto vago hacia la salida.","vaguely remember / familiar / aware","slightly = ligeramente; vaguely = de forma borrosa, poco precisa.","‘Vaguely familiar’ es una colocación muy frecuente.","Vago = vaguely: una memoria vaga."],
+["veritable","adj","/ˈverɪtəbl/","verdadero, auténtico (para enfatizar)","rightly called","The papers said the parade was a veritable disaster because of the poor weather.","Used to emphasize that a description is really true.","The garden was a [veritable] paradise.","El jardín era un auténtico paraíso.","The kitchen became a [veritable] battlefield.","La cocina se convirtió en un verdadero campo de batalla.","a veritable feast / paradise / disaster","real = real; true = verdadero; veritable = enfático, ‘un auténtico…’ (casi siempre metafórico).","Va delante del sustantivo: a veritable feast. No se dice ‘The paradise was veritable’.","Veritas (verdad): un verdadero desastre."],
+["virile","adj","/ˈvɪraɪl/","viril, varonil","masculine, manly","There were many virile competitors in the body-building event.","Strong, energetic and masculine in a physical or sexual way.","The actor played a [virile] hero.","El actor interpretó a un héroe viril.","He wanted to look [virile] and strong in the photos.","Quería parecer varonil y fuerte en las fotos.","virile young man; virile image","masculine = masculino (neutro); manly = varonil; virile = viril, con fuerza y energía sexual.","Pronunciación: /ˈvɪraɪl/ (británico) o /ˈvɪrəl/ (americano).","Viril = virile."],
+["vitality","n","/vaɪˈtæləti/","vitalidad, energía","energy, life","I was filled with a sense of vitality following the graduation ceremony.","Energy and enthusiasm for life.","The city is full of [vitality] at night.","La ciudad está llena de vitalidad por la noche.","Exercise gives me more [vitality].","El ejercicio me da más vitalidad.","full of vitality; youthful vitality; lose vitality","energy = energía (general); vigour = vigor; vitality = energía y ganas de vivir.","Incontable: ‘vitality’ sin ‘a’.","Vital → vitality."],
+["voodoo","n","/ˈvuːduː/","vudú","a practice which involves sticking pins in dolls in order to cause pain to human beings","I was so mad when I saw my boyfriend with another woman that I actually thought about making a voodoo doll of her.","A religion and magic tradition; popularly, using dolls and pins to hurt someone.","She made a [voodoo] doll of her ex-boyfriend.","Hizo un muñeco vudú de su exnovio.","He says economic forecasts are just [voodoo].","Dice que las previsiones económicas son puro vudú.","voodoo doll; voodoo magic; practise voodoo","magic = magia; witchcraft = brujería; voodoo = vudú, también ‘algo sin base racional’.","Nota: el material lo marca como (adj) por el uso en ‘voodoo doll’, pero es sustantivo usado delante de otro sustantivo.","Vudú = voodoo."],
+["well","v","/wel/","brotar, llenarse de líquido","filling with liquid","The sink was welling with soap and about to overflow.","When liquid rises up and starts to fill or flow (often tears).","Tears [welled] up in her eyes.","Se le llenaron los ojos de lágrimas.","Water [welled] up from the ground.","El agua brotaba del suelo.","tears well up; well up in somebody's eyes; emotion wells up","fill = llenar; overflow = desbordarse; well (up) = subir y acumularse un líquido.","Nota: la definición del material dice ‘filling with liquid’; como verbo base es ‘fill with liquid’. Casi siempre ‘well up’.","A well es un pozo: el agua sube del pozo."],
+["whore","n","/hɔː(r)/","prostituta (término ofensivo)","prostitute; person who has sexual relations with strangers for money","The whores stand on the street and wait for men to pick them up.","An offensive word for a prostitute; also used as a strong insult.","In old novels, the word ‘[whore]’ appears often.","En las novelas antiguas aparece a menudo la palabra ‘whore’.","Calling someone a ‘[whore]’ is a serious insult.","Llamar ‘whore’ a alguien es un insulto grave.","Úsalo con mucho cuidado","prostitute = término neutro; sex worker = término respetuoso actual; whore = ofensivo y vulgar.","Muy ofensivo: evita usarlo para hablar de personas. Pronunciación: /hɔː/, la ‘w’ no suena.","La ‘w’ es muda, como hour: whore suena como ‘hor’."],
+["wits' end","idiom","/wɪts end/","al límite, sin saber qué hacer","unable to find a solution; no longer able to tolerate","I am at my wits' end trying to keep these ants out of the house.","So worried or frustrated that you don't know what to do next.","I'm at my [wits' end] with this broken printer.","Estoy al límite con esta impresora rota.","Parents of newborns are often at their [wits' end].","Los padres de recién nacidos a menudo no saben qué más hacer.","be at your wits' end; drive somebody to their wits' end","desperate = desesperado; at your wits' end = has agotado ideas y paciencia.","Siempre ‘AT my / your / her wits' end’, con posesivo.","Wits = ingenio: llegas al final (end) de tu ingenio."],
+["wring","v","/rɪŋ/","retorcer, apretar fuerte (las manos)","clasp, squeeze tightly","The woman wrung her hands while the policeman wrote up her speeding ticket.","To twist and squeeze something tightly, often your hands when worried.","She [wrung] her hands nervously.","Se retorcía las manos nerviosa.","[Wring] out the wet towel before you hang it.","Escurre la toalla mojada antes de colgarla.","wring your hands; wring out clothes; wring somebody's neck","twist = torcer; squeeze = apretar; wring = retorcer para escurrir o por nervios.","Irregular: wring – wrung – wrung. La ‘w’ no suena: /rɪŋ/, igual que ‘ring’.","Suena como ring: te retuerces el anillo (ring) de nervios."],
+["wryly","adv","/ˈraɪli/","con ironía, con humor seco","using dry, mocking humour","“Adam got caught trying to steal another car,” his ex-girlfriend said wryly.","In a way that shows dry, slightly mocking humour.","“Great weather for a picnic,” he said [wryly] as it rained.","—Qué buen tiempo para un picnic —dijo con ironía mientras llovía.","She smiled [wryly] at her own mistake.","Sonrió irónicamente ante su propio error.","say wryly; smile wryly; wry smile (adj)","ironically = irónicamente (general); sarcastically = con sarcasmo (más hiriente); wryly = humor seco y suave.","La ‘w’ no suena: /ˈraɪli/, como ‘rye-ly’.","Wry suena a ‘rai’: una sonrisa torcida e irónica."],
+["yearn for","v","/jɜːn fɔː(r)/","anhelar, añorar","want intensely","My parents tell everyone how much they yearn for grandchildren.","To want something very much, often something you can't easily have.","She [yearned for] a quiet life in the country.","Anhelaba una vida tranquila en el campo.","After months abroad, he [yearned for] his mother's cooking.","Tras meses en el extranjero, añoraba la comida de su madre.","yearn for something; yearn to do something; a yearning for","want = querer; long for = anhelar (muy cercano); crave = deseo físico; yearn for = anhelo emocional profundo.","Lleva ‘for’ (yearn for peace) o ‘to’ + verbo (yearn to travel).","Year (año): llevas años (years) anhelándolo."]
+);
+</script>
+<script>
+(function(){
+"use strict";
+/* ---------- Datos ---------- */
+const slug=s=>s.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+const grp=p=>/^adv/.test(p)?'adv':/^(adj|past)/.test(p)?'adj':/^v/.test(p)?'v':/^n/.test(p)?'n':/^idiom/.test(p)?'idiom':'other';
+const WORDS=W.map((a,i)=>({id:slug(a[0]),i,w:a[0],pos:a[1],ipa:a[2],es:a[3],def:a[4],exM:a[5],simple:a[6],ex:[[a[7],a[8]],[a[9],a[10]]],col:a[11].split(';').map(s=>s.trim()).filter(Boolean),syn:a[12],err:a[13],hook:a[14],g:grp(a[1])}));
+const BY=Object.fromEntries(WORDS.map(w=>[w.id,w]));
+const BLOCK=6, BLOCKS=[];
+for(let i=0;i<WORDS.length;i+=BLOCK) BLOCKS.push(WORDS.slice(i,i+BLOCK).map(w=>w.id));
+const DAY=864e5, INTERVALS=[0,1,2,4,7,14,30,60];
+const LEVELS=[
+ {n:'Nueva',d:'Todavía no la has estudiado.'},
+ {n:'En aprendizaje',d:'La estudiaste, pero aún no la has practicado con éxito.'},
+ {n:'Recuerda con ayuda',d:'La reconoces cuando ves opciones o pistas.'},
+ {n:'Recuerda sin ayuda',d:'La escribes desde su significado, sin opciones.'},
+ {n:'La usa en frases',d:'Además, la usaste bien en una frase propia.'},
+ {n:'Dominada',d:'La recordaste sin ayuda en 2 días distintos y la usaste en una frase.'}];
+const TYPES={flash:'Flashcards',mc:'Opción múltiple',fill:'Completar la frase',match:'Emparejar',context:'Desafío de contexto',recall:'Recuerdo activo',sentence:'Crear frases'};
+const RECALL=new Set(['fill','recall']);
+
+/* ---------- Utilidades ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const mk=s=>esc(s).replace(/\[([^\]]+)\]/g,'<mark>$1</mark>');
+const blank=s=>esc(s).replace(/\[([^\]]+)\]/g,'<span class="blank" aria-label="espacio en blanco">____</span>');
+const formOf=s=>[...s.matchAll(/\[([^\]]+)\]/g)].map(m=>m[1]).join(' ');
+const plain=s=>s.replace(/[\[\]]/g,'');
+const norm=s=>String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[’‘`´]/g,"'").replace(/[^a-z' -]/g,'').replace(/\s+/g,' ').trim();
+const baseOf=w=>w.w.replace(/ somebody$/,'');
+function lev(a,b){const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,j)=>j);for(let i=1;i<=m;i++){let c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function dayKey(t=Date.now()){const d=new Date(t);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function accepts(w,typed,form){
+  const t=norm(typed); if(!t) return {ok:false,empty:true};
+  const c=new Set([w.w,baseOf(w),form].filter(Boolean).map(norm));
+  for(const x of [...c]){c.add(x.replace(/-/g,' '));c.add(x.replace(/'/g,''));}
+  const tv=[t,t.replace(/-/g,' '),t.replace(/'/g,'')];
+  if(tv.some(x=>c.has(x))) return {ok:true};
+  const b=norm(baseOf(w));
+  if(b.length>=3&&t.startsWith(b)&&t.length-b.length<=3) return {ok:true,inflected:true};
+  for(const x of c){const lim=x.length>=9?2:x.length>=5?1:0;if(lim&&lev(t,x)<=lim) return {ok:true,typo:x};}
+  return {ok:false};
+}
+const ICON={
+ home:'<path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/>',
+ study:'<path d="M4 5h6a3 3 0 013 3v12a2 2 0 00-2-2H4z"/><path d="M20 5h-6a3 3 0 00-3 3v12a2 2 0 012-2h7z"/>',
+ practice:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6" fill="currentColor"/>',
+ review:'<path d="M4 12a8 8 0 0114-5.3L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 01-14 5.3L4 16"/><path d="M4 20v-4h4"/>',
+ challenge:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+ cards:'<rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 012 2v12"/>',
+ progress:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+ sound:'<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',
+ ok:'<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+ bad:'<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>',
+ warn:'<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>',
+ arrowR:'<path d="M5 12h14M13 6l6 6-6 6"/>', arrowL:'<path d="M19 12H5M11 6l-6 6 6 6"/>',
+ flag:'<path d="M5 21V4h11l-2 4 2 4H5"/>', bookmark:'<path d="M6 3h12v18l-6-4-6 4z"/>', check:'<path d="M5 12l5 5 9-10"/>'
+};
+const ic=(n,cls='')=>`<svg class="${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[n]}</svg>`;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200)}
+const canSpeak='speechSynthesis' in window && 'SpeechSynthesisUtterance' in window;
+function speak(text){
+  if(!canSpeak){toast('Este navegador no permite reproducir la pronunciación.');return}
+  try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);const vs=speechSynthesis.getVoices();const v=vs.find(v=>/en[-_]GB/i.test(v.lang))||vs.find(v=>/^en/i.test(v.lang));if(v)u.voice=v;u.lang=v?v.lang:'en-GB';u.rate=.88;speechSynthesis.speak(u)}catch(e){toast('No se pudo reproducir el audio.')}
+}
+const spk=t=>canSpeak?`<button class="speak" data-act="speak" data-t="${esc(t)}" aria-label="Escuchar pronunciación de ${esc(t)}" title="Escuchar">${ic('sound')}</button>`:'';
+
+/* ---------- Estado y guardado ---------- */
+const LS='metro-vocab-v1';
+const fresh=()=>({v:1,updated:0,p:{},types:{},daily:{},best:0,challenges:[],sent:{}});
+let S=fresh();
+try{const raw=localStorage.getItem(LS);if(raw){const o=JSON.parse(raw);if(o&&o.v===1)S=Object.assign(fresh(),o)}}catch(e){}
+const store={mode:'local',ref:null,saving:false,again:false,failed:false};
+function P(id){return S.p[id]||(S.p[id]={seen:0,box:0,due:0,rec:0,recN:0,recall:[],prod:0,wrong:0,lapse:0,hard:0,saved:0,known:0,conf:{},hist:[],last:0})}
+function level(id){
+  const p=S.p[id]; if(!p||(!p.seen&&!p.known)) return 0;
+  let L=1;
+  if(p.rec>0||p.recN>0) L=2;
+  if(p.recN>0) L=3;
+  if(p.prod>0&&p.recN>0) L=4;
+  if(L===4&&new Set(p.recall).size>=2) L=5;
+  if(p.lapse&&L>2) L=2;
+  return L;
+}
+function save(){
+  S.updated=Date.now();
+  try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){}
+  if(store.ref){clearTimeout(save.t);save.t=setTimeout(pushCloud,1200)}
+}
+async function pushCloud(){
+  if(!store.ref) return;
+  if(store.saving){store.again=true;return}
+  store.saving=true;
+  try{await store.ref.set({state:JSON.stringify(S),updated:S.updated});store.mode='cloud';store.failed=false}
+  catch(e){store.failed=true}
+  store.saving=false; renderSaveState();
+  if(store.again){store.again=false;pushCloud()}
+}
+function renderSaveState(){
+  const el=$('#saveState'); el.classList.toggle('cloud',store.mode==='cloud'&&!store.failed);
+  el.lastElementChild.textContent = store.mode==='cloud'&&!store.failed ? 'Guardado en tu cuenta' : store.failed ? 'Sin conexión · en este navegador' : 'En este navegador';
+}
+async function initCloud(){
+  try{
+    if(!window.claude||typeof window.claude.use!=='function') return;
+    const [user,db]=await Promise.all([window.claude.use('user'),window.claude.use('db')]);
+    if(!user||!db) return;
+    const id=await user.id(); if(!id) return;
+    const ref=db.doc('data/users/'+id+'/progress');
+    const snap=await ref.get();
+    store.ref=ref; store.mode='cloud';
+    if(snap.exists){
+      const d=snap.data()||{}; let c=null; try{c=JSON.parse(d.state)}catch(e){}
+      if(c&&c.v===1&&(c.updated||0)>(S.updated||0)){S=Object.assign(fresh(),c);try{localStorage.setItem(LS,JSON.stringify(S))}catch(e){} if(!SES&&!ST) render()}
+      else if((S.updated||0)>((c&&c.updated)||0)) pushCloud();
+    } else if(S.updated) pushCloud();
+  }catch(e){store.ref=null;store.mode='local'}
+  finally{renderSaveState()}
+}
+function record(id,type,ok,o={}){
+  const p=P(id), now=Date.now(), k=dayKey(now);
+  p.seen=1; p.last=now;
+  p.hist.push([now,type,ok?1:0]); if(p.hist.length>16) p.hist.shift();
+  const t=S.types[type]||(S.types[type]={n:0,ok:0}); t.n++; if(ok) t.ok++;
+  S.daily[k]=(S.daily[k]||0)+1;
+  if(ok){
+    if(type==='sentence'){p.prod++; if(p.box<2)p.box=2}
+    else if(RECALL.has(type)&&!o.hinted){p.recN++; if(!p.recall.includes(k)){p.recall.push(k); if(p.recall.length>12)p.recall.shift()} p.lapse=0; p.box=Math.min(p.box+1,7)}
+    else if(p.box<3) p.box++;
+    if(o.weak) p.box=Math.max(1,p.box-1);
+    p.due=now+INTERVALS[p.box]*DAY;
+  } else {
+    p.wrong++; p.lapse=1; p.box=1; p.due=now+10*60*1000;
+    if(o.conf&&o.conf!==id) p.conf[o.conf]=(p.conf[o.conf]||0)+1;
+  }
+  save();
+}
+const isDue=(id,now=Date.now())=>{const p=S.p[id];return !!p&&((p.seen&&p.due<=now)||p.saved)};
+function dueList(){
+  const now=Date.now();
+  return WORDS.filter(w=>isDue(w.id,now)).map(w=>{const p=S.p[w.id];const over=Math.max(0,(now-p.due)/DAY);return {id:w.id,score:over+p.wrong*1.5+p.hard*3+p.saved*4+(5-level(w.id))}}).sort((a,b)=>b.score-a.score);
+}
+const counts=()=>{const c=[0,0,0,0,0,0];WORDS.forEach(w=>c[level(w.id)]++);return c};
+function blockState(b){
+  const ids=BLOCKS[b], ls=ids.map(level);
+  if(ls.every(l=>l===5)) return 'master';
+  if(ls.every(l=>l>=1)) return 'done';
+  if(ls.some(l=>l>=1)) return 'part';
+  return '';
+}
+const nextBlock=()=>{const i=BLOCKS.findIndex(ids=>ids.some(id=>level(id)===0));return i<0?0:i};
+
+/* ---------- Navegación ---------- */
+const NAV=[['home','Inicio'],['study','Estudiar'],['practice','Practicar'],['review','Repaso'],['challenge','Desafío'],['cards','Fichas'],['progress','Progreso']];
+let VIEW='home', SES=null, ST=null, LIB={q:'',f:'all',sel:null,open:{}};
+function renderNav(){
+  const due=dueList().length;
+  $('#nav').innerHTML=NAV.map(([v,l])=>`<button data-act="go" data-v="${v}" ${VIEW===v?'aria-current="page"':''}>${ic(v)}<span>${l}</span>${v==='review'&&due?`<span class="badge num">${due}</span>`:''}</button>`).join('');
+}
+function go(v){
+  if(VIEW!==v){ if(v!=='practice'&&v!=='review'&&v!=='challenge') SES=null; if(v!=='study') ST=null; if(SES&&SES.view!==v) SES=null; }
+  VIEW=v; render(); window.scrollTo({top:0});
+  try{history.replaceState(null,'','#'+v)}catch(e){}
+}
+function render(){
+  renderNav();
+  const v=$('#view');
+  if((VIEW==='practice'||VIEW==='review'||VIEW==='challenge')&&SES) return renderSession();
+  if(VIEW==='study'&&ST) return renderStudy();
+  v.innerHTML=({home:viewHome,study:viewStudyIndex,practice:viewPractice,review:viewReview,challenge:viewChallenge,cards:viewCards,progress:viewProgress}[VIEW]||viewHome)();
+  if(VIEW==='cards') mountCards();
+}
+
+/* ---------- Inicio ---------- */
+function levelBar(c){const tot=WORDS.length;return `<div class="levels" role="img" aria-label="Distribución por nivel">${c.map((n,i)=>`<i style="width:${n/tot*100}%;background:var(--lv${i})" title="${LEVELS[i].n}: ${n}"></i>`).join('')}</div><div class="legend">${c.map((n,i)=>`<span><i class="sw" style="background:var(--lv${i})"></i>${LEVELS[i].n} <b class="num">${n}</b></span>`).join('')}</div>`}
+function metroLine(){
+  const here=nextBlock();
+  return `<div class="line-wrap"><div class="line">${BLOCKS.map((ids,b)=>`<button class="stn ${blockState(b)} ${b===here?'here':''}" data-act="block" data-b="${b}" title="Estación ${b+1}: ${esc(BY[ids[0]].w)} → ${esc(BY[ids[ids.length-1]].w)}"><span class="c">${b+1}</span><small>${esc(BY[ids[0]].w.slice(0,6))}</small></button>`).join('')}</div></div>`;
+}
+function recommend(){
+  const c=counts(), studied=WORDS.length-c[0], due=dueList().length;
+  const nb=nextBlock(), bw=BLOCKS[nb].map(id=>BY[id].w);
+  const learnBlock={t:`Aprende la Estación ${nb+1}`,d:`${bw.length} palabras nuevas: ${bw.join(', ')}. Primero la explicación y los ejemplos; después intentas recordarlas y escribes una frase propia.`,cta:'Empezar a estudiar',act:'block',arg:nb};
+  if(studied===0) return {...learnBlock,t:'Empieza por la Estación 1',d:'Vas a aprender 6 palabras con su explicación, ejemplos y una frase propia. Son unos 15 minutos.'};
+  if(due>=8) return {t:`Tienes ${due} palabras para repasar`,d:'Repasarlas ahora, justo cuando empiezan a olvidarse, es lo que más fija la memoria. Empezamos por las más difíciles.',cta:'Empezar repaso',act:'startReview'};
+  if(c[1]>=4) return {t:'Pon a prueba lo que estudiaste',d:`Hay ${c[1]} palabras que estudiaste pero aún no practicaste con éxito. Una sesión mixta te dirá cuáles ya recuerdas.`,cta:'Práctica mixta',act:'startPractice',arg:'mixed'};
+  if(c[2]>=6) return {t:'Pasa de reconocer a recordar',d:`${c[2]} palabras las reconoces con opciones. El siguiente paso es escribirlas sin ayuda: recuerdo activo.`,cta:'Recuerdo activo',act:'startPractice',arg:'recall'};
+  if(c[3]>=4) return {t:'Úsalas en tus propias frases',d:`Ya recuerdas ${c[3]} palabras sin ayuda. Escribir una frase con cada una es lo que te permite usarlas en inglés real.`,cta:'Crear frases',act:'startPractice',arg:'sentence'};
+  if(due>0) return {t:`Repasa ${due} palabra${due>1?'s':''}`,d:'Te tocan según tu calendario de repaso. Son pocas: unos minutos bastan.',cta:'Empezar repaso',act:'startReview'};
+  if(c[0]>0) return learnBlock;
+  return {t:'Mide tu dominio en el desafío',d:'Has recorrido toda la línea. Haz un desafío para comprobar qué palabras siguen firmes.',cta:'Empezar desafío',act:'startChallenge'};
+}
+function viewHome(){
+  const c=counts(), tot=WORDS.length, studied=tot-c[0], due=dueList().length;
+  const pct=Math.round(c.reduce((s,n,i)=>s+n*i,0)/(tot*5)*100);
+  const r=recommend();
+  return `
+  <section class="hero">
+    <div class="card stack">
+      <div><p class="eyebrow">Vocabulario de la lectura · The Metro</p><h1>Tu línea de vocabulario</h1></div>
+      <p class="muted">Cada estación es un bloque de 6 palabras. Recórrelas en orden: aprende, practica y vuelve a repasar cuando el sistema te lo pida.</p>
+      <div class="kpis">
+        <div class="kpi"><b>${tot}</b><span>palabras en total</span></div>
+        <div class="kpi"><b>${studied}</b><span>estudiadas</span></div>
+        <div class="kpi"><b>${c[5]}</b><span>dominadas</span></div>
+        <div class="kpi"><b>${pct}%</b><span>progreso</span></div>
+        <div class="kpi"><b>${due}</b><span>para repasar</span></div>
+      </div>
+      <div class="bar" aria-label="Progreso ${pct}%"><i style="width:${pct}%"></i></div>
+    </div>
+    <div class="reco fade-in">
+      <p class="eyebrow">Siguiente paso recomendado</p>
+      <h2>${esc(r.t)}</h2>
+      <p>${esc(r.d)}</p>
+      <button class="btn" data-act="${r.act}" ${r.arg!=null?`data-b="${r.arg}" data-t="${r.arg}"`:''}>${esc(r.cta)} ${ic('arrowR')}</button>
+    </div>
+  </section>
+  <section class="card stack">
+    <div class="row" style="justify-content:space-between"><h3>El recorrido</h3><span class="small muted">Toca una estación para estudiarla</span></div>
+    ${metroLine()}
+    ${levelBar(c)}
+  </section>
+  <section class="quick">
+    <button class="qa" data-act="go" data-v="study">${ic('study')}<b>Estudiar</b><span>Aprende palabras nuevas paso a paso.</span></button>
+    <button class="qa" data-act="go" data-v="practice">${ic('practice')}<b>Practicar</b><span>7 tipos de ejercicio con corrección inmediata.</span></button>
+    <button class="qa" data-act="go" data-v="review">${ic('review')}<b>Repasar</b><span>${due?`${due} palabras esperan repaso.`:'Nada pendiente ahora mismo.'}</span></button>
+    <button class="qa" data-act="go" data-v="challenge">${ic('challenge')}<b>Desafío</b><span>Quiz con dificultad progresiva y racha.</span></button>
+  </section>
+  <details class="card flat">
+    <summary>Cómo mide el sistema tu dominio</summary>
+    <div class="stack" style="margin-top:12px">
+      ${LEVELS.map((l,i)=>`<div class="row" style="align-items:flex-start;flex-wrap:nowrap"><span class="chip"><i class="sw" style="background:var(--lv${i})"></i>${l.n}</span><span class="small muted">${l.d}</span></div>`).join('')}
+      <p class="small muted">Acertar una pregunta de opción múltiple no basta para dominar una palabra. Si fallas una, vuelve a «Recuerda con ayuda» hasta que la escribas bien sin pistas. Los repasos se programan a 1, 2, 4, 7, 14, 30 y 60 días.</p>
+    </div>
+  </details>`;
+}
+
+/* ---------- Estudiar ---------- */
+function viewStudyIndex(){
+  const nb=nextBlock();
+  return `<section class="card stack">
+    <div class="row" style="justify-content:space-between;align-items:flex-end"><div><p class="eyebrow">Modo de estudio guiado</p><h1>Estaciones</h1></div><button class="btn primary" data-act="block" data-b="${nb}">Continuar en la Estación ${nb+1} ${ic('arrowR')}</button></div>
+    <p class="muted">Cada palabra pasa por 5 pasos: <b>comprender</b>, leer <b>ejemplos</b>, ver cómo se <b>usa</b>, <b>recordar</b> sin mirar y <b>producir</b> una frase tuya. Al terminar el bloque, lo practicas.</p>
+  </section>
+  <section class="card"><div class="stations">${BLOCKS.map((ids,b)=>{const n=ids.filter(id=>level(id)>=1).length;const st=blockState(b);return `<button class="st-row ${st}" data-act="block" data-b="${b}"><span class="c">${b+1}</span><span class="st-name">Estación ${b+1}<small>${ids.map(id=>esc(BY[id].w)).join(' · ')}</small></span><span class="chip ${st==='master'?'ok':''} num">${st==='master'?'Dominada':`${n}/${ids.length}`}</span></button>`}).join('')}</div></section>`;
+}
+const STEPS=['Comprender','Ejemplos','Uso','Recordar','Producir'];
+function startBlock(b){ST={b:+b,wi:0,step:0,rev:{},seenSteps:{},done:false};VIEW='study';const id=BLOCKS[ST.b][0];P(id).seen=1;save();render();window.scrollTo({top:0})}
+function renderStudy(){
+  renderNav();
+  const ids=BLOCKS[ST.b];
+  if(ST.done) return renderBlockEnd();
+  const id=ids[ST.wi], w=BY[id], p=P(id);
+  ST.seenSteps[id+':'+ST.step]=1;
+  const steps=`<div class="steps" role="list">${STEPS.map((s,i)=>`<button role="listitem" data-act="step" data-s="${i}" ${i===ST.step?'aria-current="step"':''} class="${ST.seenSteps[id+':'+i]?'seen':''}"><i>${i+1}</i>${s}</button>`).join('')}</div>`;
+  let body='';
+  if(ST.step===0) body=`
+    <div class="sec"><p class="eyebrow">Significado en español</p><p style="font-size:1.2rem">${esc(w.es)}</p></div>
+    <div class="sec"><p class="eyebrow">Explicación sencilla (inglés)</p><p style="font-size:1.1rem">${esc(w.simple)}</p></div>
+    <div class="sec"><p class="eyebrow">Definición del material</p><p class="muted">${esc(w.def)}</p></div>`;
+  if(ST.step===1) body=`
+    <div class="sec"><p class="eyebrow">Ejemplo del material</p><p style="font-size:1.1rem">${esc(w.exM)}</p><p class="note">El material incluye esta frase de ejemplo. La frase original de la lectura no aparece en el material, así que no se muestra.</p></div>
+    <div class="sec"><p class="eyebrow">Ejemplos en contexto</p>${w.ex.map((e,i)=>`<div class="ex-line"><p style="font-size:1.1rem">${mk(e[0])} ${spk(plain(e[0]))}</p>${ST.rev['tr'+i]?`<p class="tr fade-in">${esc(e[1])}</p>`:`<button class="btn ghost sm" data-act="rev" data-k="tr${i}" style="justify-self:start">Ver traducción</button>`}</div>`).join('')}
+    <p class="small muted">Intenta entender cada frase en inglés antes de mirar la traducción.</p></div>`;
+  if(ST.step===2) body=`
+    <div class="sec"><p class="eyebrow">Combinaciones frecuentes</p><div class="colls">${w.col.map(c=>`<span>${esc(c)}</span>`).join('')}</div></div>
+    <div class="sec"><p class="eyebrow">Sinónimos y diferencias</p><p>${esc(w.syn)}</p></div>
+    <div class="sec"><p class="eyebrow">Errores comunes</p><p>${esc(w.err)}</p></div>
+    <div class="sec"><p class="eyebrow">Truco para recordar</p><p class="hook">${esc(w.hook)}</p></div>`;
+  if(ST.step===3) body = ST.rev.recall ? `
+    <div class="sec fade-in"><p class="eyebrow">Respuesta</p><p style="font-size:1.2rem">${esc(w.es)}</p><p>${mk(w.ex[0][0])}</p></div>
+    ${ST.rev.rated?`<p class="note">Valoración guardada. Pasa al último paso.</p>`:`<div class="sec"><p class="eyebrow">¿Lo recordaste?</p><div class="row"><button class="btn" data-act="studyRate" data-r="again">No lo recordé</button><button class="btn" data-act="studyRate" data-r="hard">Con dudas</button><button class="btn primary" data-act="studyRate" data-r="good">Sí, lo recordé</button></div></div>`}` : `
+    <div class="sec"><p class="eyebrow">Recuerdo sin mirar</p><p style="font-size:1.1rem">Sin volver atrás: ¿qué significa <b>${esc(w.w)}</b>? Dilo en voz alta o en tu cabeza, en español o en inglés.</p>
+    <button class="btn primary" data-act="rev" data-k="recall" style="justify-self:start">Mostrar la respuesta</button></div>`;
+  if(ST.step===4) body=`<div class="sec"><p class="eyebrow">Producción</p>${sentenceBuilderHTML(w,'study')}</div>`;
+  const last=ST.wi===ids.length-1&&ST.step===4;
+  $('#view').innerHTML=`
+  <section class="sess-head">
+    <div class="sess-top"><button class="btn ghost sm" data-act="exitStudy">${ic('arrowL')} Estaciones</button><span class="small muted num">Estación ${ST.b+1} · palabra ${ST.wi+1} de ${ids.length}</span></div>
+    <div class="bar"><i style="width:${((ST.wi*5+ST.step+1)/(ids.length*5))*100}%"></i></div>
+  </section>
+  <section class="card stack fade-in" style="gap:16px">
+    <div class="word-head"><div style="flex:1;min-width:0"><div class="w">${esc(w.w)}</div><div class="meta"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span>${p.hard?'<span class="chip hard">Difícil</span>':''}</div></div>${spk(w.w)}</div>
+    ${steps}
+    ${body}
+    <div class="foot">
+      <button class="btn" data-act="studyPrev" ${ST.wi===0&&ST.step===0?'disabled':''}>${ic('arrowL')} Anterior</button>
+      <button class="btn ghost" data-act="toggleHard" data-id="${id}">${ic('flag')} ${p.hard?'Quitar «difícil»':'Marcar como difícil'}</button>
+      <button class="btn primary" data-act="studyNext">${last?'Terminar bloque':ST.step===4?'Siguiente palabra':'Siguiente'} ${ic('arrowR')}</button>
+    </div>
+  </section>`;
+  mountSentence(w,'study');
+}
+function studyMove(d){
+  const ids=BLOCKS[ST.b]; let {wi,step}=ST; step+=d;
+  if(step>4){if(wi<ids.length-1){wi++;step=0}else{ST.done=true;render();window.scrollTo({top:0});return}}
+  if(step<0){if(wi>0){wi--;step=4}else step=0}
+  if(wi!==ST.wi) ST.rev={};
+  if(step!==3){delete ST.rev.recall;delete ST.rev.rated}
+  ST.wi=wi;ST.step=step;P(ids[wi]).seen=1;save();renderStudy();window.scrollTo({top:0});
+}
+function renderBlockEnd(){
+  const ids=BLOCKS[ST.b];
+  $('#view').innerHTML=`<section class="card stack fade-in">
+    <p class="eyebrow">Estación ${ST.b+1} completada</p><h1>Has estudiado ${ids.length} palabras</h1>
+    <p class="muted">Ahora conviene practicarlas: el sistema empieza con preguntas de reconocimiento y termina pidiéndote que las escribas sin ayuda.</p>
+    <div class="colls">${ids.map(id=>`<span>${esc(BY[id].w)}</span>`).join('')}</div>
+    <div class="row"><button class="btn primary" data-act="practiceBlock" data-b="${ST.b}">Practicar este bloque ${ic('arrowR')}</button>${ST.b<BLOCKS.length-1?`<button class="btn" data-act="block" data-b="${ST.b+1}">Siguiente estación</button>`:''}<button class="btn ghost" data-act="exitStudy">Volver a las estaciones</button></div>
+  </section>`;
+}
+
+/* ---------- Constructor de frases (compartido) ---------- */
+let sampleFn=null, sampleState='unknown';
+function sentenceBuilderHTML(w,ctx){
+  const prev=(S.sent[w.id]||[]).slice(-1)[0];
+  return `<div class="stack" id="sb">
+    <p>Escribe una frase propia en inglés con <b>${esc(w.w)}</b>, usando el significado de la lectura: <span class="muted">${esc(w.es)}</span>.</p>
+    <details><summary class="small">Ver combinaciones como ayuda</summary><div class="colls" style="margin-top:8px">${w.col.map(c=>`<span>${esc(c)}</span>`).join('')}</div></details>
+    <label class="small muted" for="sbText">Tu frase</label>
+    <textarea id="sbText" placeholder="Ejemplo: I always ... when ..." spellcheck="false"></textarea>
+    <div class="row"><button class="btn primary" data-act="sbSubmit" data-id="${w.id}" data-ctx="${ctx}">Evaluar mi frase</button>${ctx==='study'?'<button class="btn ghost" data-act="studyNext">Saltar por ahora</button>':''}</div>
+    <div id="sbOut"></div>
+    ${prev?`<p class="small muted">Tu última frase con esta palabra: “${esc(prev.text)}”</p>`:''}
+  </div>`;
+}
+function mountSentence(){ const t=$('#sbText'); if(t) t.addEventListener('keydown',e=>{if(e.key==='Enter'&&(e.metaKey||e.ctrlKey)){e.preventDefault();$('[data-act="sbSubmit"]')?.click()}}) }
+function mentions(w,text){
+  const flat=s=>norm(s).replace(/-/g,' ').replace(/'/g,'');
+  const t=' '+flat(text)+' ';
+  const key=flat(baseOf(w)).split(' ').filter(x=>x.length>2&&!['the','for','act'].includes(x));
+  const k=key.length?key:[flat(baseOf(w))];
+  const stem=part=>{let s=part.length>3?part.replace(/e$/,''):part;if(s.length>5)s=s.slice(0,-1);return s};
+  const irregular={thrust:['thrust'],wring:['wrung','wring'],sob:['sobb','sob'],stir:['stirr','stir'],stun:['stunn','stun'],come:['came','come','coming'],caught:['catch','caught'],fetch:['fetch'],defer:['deferr','defer'],intersected:['intersect'],captivated:['captivat'],demoralized:['demoralis','demoraliz'],severing:['sever'],revelries:['revelr'],clairvoyants:['clairvoyant'],buskers:['busker'],hawkers:['hawker'],advances:['advance'],papers:['paper']};
+  return k.every(part=>{const stems=irregular[part]||[stem(part)];return stems.some(s=>t.includes(' '+s)||t.includes('-'+s))});
+}
+async function submitSentence(id,ctx){
+  const w=BY[id], ta=$('#sbText'), out=$('#sbOut'), text=(ta.value||'').trim();
+  if(text.split(/\s+/).length<4){out.innerHTML=`<div class="fb warn"><div class="fb-head">${ic('warn')} Escribe una frase completa</div><p>Usa al menos 4 palabras para que se vea cómo usas <b>${esc(w.w)}</b>.</p></div>`;return}
+  if(!mentions(w,text)){out.innerHTML=`<div class="fb warn"><div class="fb-head">${ic('warn')} Falta la palabra</div><p>Tu frase no parece incluir <b>${esc(w.w)}</b> (en cualquiera de sus formas). Añádela y vuelve a evaluar.</p></div>`;return}
+  const btn=$('[data-act="sbSubmit"]'); btn.disabled=true; ta.readOnly=true;
+  if(sampleFn&&sampleState!=='denied'){
+    out.innerHTML=`<p class="note">Evaluando tu frase…</p>`;
+    try{
+      const r=await sampleFn.json(`You are a kind, precise English teacher for a Spanish-speaking adult learner.
+Target word: "${w.w}" (${w.pos}). Meaning in the reading: "${w.def}" (Spanish: ${w.es}).
+Student sentence: """${text.slice(0,500)}"""
+Evaluate the sentence. Accept inflected forms of the word. Distinguish real grammar errors from sentences that are correct but could sound more natural.
+Reply ONLY with JSON:
+{"verdict":"correct"|"correct_but_unnatural"|"grammar_error"|"wrong_meaning","word_used_correctly":true|false,"feedback_es":"2-3 frases en español, amables y específicas: qué está bien y qué cambiar","corrected":"corrected sentence in English, or empty string if no errors","more_natural":"a more natural version in English, or empty string"}
+word_used_correctly is true only if the target word is used with the meaning from the reading and with correct grammar around it.`,{modelTier:'quick'});
+      const ok=!!r.word_used_correctly&&r.verdict!=='wrong_meaning';
+      const cls=ok?(r.verdict==='correct'?'ok':'warn'):'bad';
+      const head=ok?(r.verdict==='correct'?'Frase correcta':r.verdict==='grammar_error'?'Buen uso de la palabra, con un error en otra parte':'Correcta, aunque puede sonar más natural'):(r.verdict==='wrong_meaning'?'El significado no encaja':'Revisa cómo usas la palabra');
+      saveSentence(id,text,ok,'claude');
+      sentenceDone(id,ok,ctx,`<div class="fb ${cls}"><div class="fb-head">${ic(ok?'ok':cls==='warn'?'warn':'bad')} ${esc(head)}</div><div class="fb-body"><p>${esc(r.feedback_es||'')}</p>${r.corrected?`<p><span class="eyebrow">Corrección</span><br>${esc(r.corrected)}</p>`:''}${r.more_natural?`<p><span class="eyebrow">Más natural</span><br>${esc(r.more_natural)}</p>`:''}${!ok?`<div class="mini"><p class="small muted">Recuerda:</p><p>${mk(w.ex[0][0])}</p><p class="small">${esc(w.err)}</p></div>`:''}<p class="small muted">Corregido por Claude.</p></div></div>`);
+      return;
+    }catch(e){ if(e&&e.code==='not_granted') sampleState='denied'; }
+  }
+  selfCheck(id,text,ctx);
+}
+function selfCheck(id,text,ctx){
+  const w=BY[id];
+  $('#sbOut').innerHTML=`<div class="fb warn"><div class="fb-head">${ic('warn')} Autoevaluación</div><div class="fb-body">
+    <p>No hay corrección automática disponible en esta vista, así que compara tu frase con estos modelos:</p>
+    <div class="mini">${w.ex.map(e=>`<p>${mk(e[0])}</p>`).join('')}<p class="small muted">Combinaciones: ${esc(w.col.join(' · '))}</p><p class="small">${esc(w.err)}</p></div>
+    <p class="small">¿Tu frase usa el significado de la lectura y la misma estructura que los modelos?</p>
+    <div class="row"><button class="btn primary sm" data-act="selfOk" data-id="${id}" data-ctx="${ctx}">Sí, está bien</button><button class="btn sm" data-act="selfBad" data-id="${id}" data-ctx="${ctx}">No, necesito revisarla</button></div>
+  </div></div>`;
+  CUR_SB={id,text,ctx};
+}
+let CUR_SB=null;
+function saveSentence(id,text,ok,src){const a=S.sent[id]||(S.sent[id]=[]);a.push({t:Date.now(),text,ok,src});if(a.length>3)a.shift()}
+function sentenceDone(id,ok,ctx,html){
+  if(ctx==='study'){ record(id,'sentence',ok); $('#sbOut').innerHTML=html+(ok?'':`<div class="row" style="margin-top:10px"><button class="btn sm" data-act="sbRetry">Intentar otra frase</button></div>`); }
+  else { sessResult(id,'sentence',ok); $('#sbOut').innerHTML=''; showFeedbackRaw(html, ok?'ok':'bad', !ok); }
+}
+
+/* ---------- Ejercicios ---------- */
+function distractors(w,n,pool){
+  const base=(pool&&pool.length>=n+1?pool.map(i=>BY[i]):WORDS).filter(x=>x.id!==w.id);
+  const same=shuffle(base.filter(x=>x.g===w.g)), other=shuffle(base.filter(x=>x.g!==w.g));
+  let res=same.slice(0,n); if(res.length<n) res=res.concat(other.slice(0,n-res.length));
+  if(res.length<n) res=res.concat(shuffle(WORDS.filter(x=>x.id!==w.id&&!res.includes(x))).slice(0,n-res.length));
+  return res;
+}
+function miniCard(w){return `<div class="mini"><p><b>${esc(w.w)}</b> <span class="pos">${esc(w.pos)}</span> — ${esc(w.es)}</p><p class="small">${esc(w.simple)}</p><p>${mk(w.ex[0][0])}</p><p class="small muted">Truco: ${esc(w.hook)}</p></div>`}
+const EX={
+ flash:{
+  html(it){const w=BY[it.id];return `<p class="eyebrow">Flashcard · piensa en el significado antes de girar</p>
+   <div class="flash" id="flash"><div class="flash-in">
+     <div class="face front"><div class="prompt-word">${esc(w.w)}</div><div class="row" style="justify-content:center"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span>${spk(w.w)}</div></div>
+     <div class="face back"><p style="font-size:1.15rem"><b>${esc(w.es)}</b></p><p>${esc(w.simple)}</p>${w.ex.map(e=>`<p>${mk(e[0])}</p>`).join('')}</div>
+   </div></div>
+   <div id="flashActs"><button class="btn primary" data-act="flip">Girar la tarjeta</button></div>`}},
+ mc:{
+  html(it){const w=BY[it.id];it.opts=it.opts||shuffle([w,...distractors(w,3,it.pool)]).map(x=>x.id);return `<p class="eyebrow">Opción múltiple · ¿qué significa en la lectura?</p>
+   <div class="row"><div class="prompt-word">${esc(w.w)}</div>${spk(w.w)}</div><div class="row"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span></div>
+   <div class="opts">${it.opts.map((id,i)=>`<button class="opt" data-act="opt" data-id="${id}"><kbd>${i+1}</kbd><span>${esc(BY[id].es)}</span></button>`).join('')}</div>`}},
+ context:{
+  html(it){const w=BY[it.id];it.opts=it.opts||shuffle([w,...distractors(w,3,it.pool)]).map(x=>x.id);return `<p class="eyebrow">Desafío de contexto · ¿qué palabra encaja mejor?</p>
+   <p class="sentence">${blank(w.ex[1][0])}</p><p class="small muted">Las opciones están en su forma base.</p>
+   <div class="opts">${it.opts.map((id,i)=>`<button class="opt" data-act="opt" data-id="${id}"><kbd>${i+1}</kbd><span><b>${esc(BY[id].w)}</b></span></button>`).join('')}</div>`}},
+ fill:{
+  html(it){const w=BY[it.id];return `<p class="eyebrow">Completar la frase · escribe la palabra que falta</p>
+   <p class="sentence">${blank(w.ex[0][0])}</p><p class="muted">${esc(w.ex[0][1])}</p>
+   <div class="answer"><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Escribe la palabra en inglés" aria-label="Respuesta"><button class="btn primary" data-act="check">Comprobar</button></div>
+   <div class="row"><button class="btn ghost sm" data-act="hint" id="hintBtn">Pista: primera letra</button><span id="hintOut" class="small muted"></span></div>`}},
+ recall:{
+  html(it){const w=BY[it.id];return `<p class="eyebrow">Recuerdo activo · sin opciones ni pistas</p>
+   <p style="font-size:1.25rem"><b>${esc(w.es)}</b></p><p class="muted">${esc(w.simple)}</p>
+   <div class="answer"><input id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="¿Qué palabra en inglés es?" aria-label="Respuesta"><button class="btn primary" data-act="check">Comprobar</button></div>
+   <button class="btn ghost sm" data-act="giveUp" style="justify-self:start">No la recuerdo</button>`}},
+ sentence:{
+  html(it){const w=BY[it.id];return `<p class="eyebrow">Crear frases · producción</p><div class="row"><div class="prompt-word">${esc(w.w)}</div>${spk(w.w)}</div><div class="row"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span></div>${sentenceBuilderHTML(w,'session')}`},
+  mount(it){mountSentence()}},
+ match:{
+  html(it){it.ids=it.ids||[it.id];it.right=it.right||shuffle(it.ids);it.state=it.state||{done:{},miss:{},sel:null};return `<p class="eyebrow">Emparejar · une cada palabra con su explicación</p>
+   <p class="small muted">Toca una palabra y después su explicación en inglés.</p>
+   <div class="match"><div class="col">${it.ids.map(id=>`<button class="mitem word" data-act="mL" data-id="${id}">${esc(BY[id].w)}</button>`).join('')}</div>
+   <div class="col">${it.right.map(id=>`<button class="mitem" data-act="mR" data-id="${id}">${esc(BY[id].simple)}</button>`).join('')}</div></div>`}}
+};
+
+/* ---------- Motor de sesiones ---------- */
+let CUR=null;
+function startSession(view,kind,items,title){
+  SES={view,kind,items,i:0,res:[],title,before:{},score:0,streak:0,best:0,tier:1,wrongRow:0};
+  items.forEach(it=>(it.ids||[it.id]).forEach(id=>{if(id)SES.before[id]=level(id)}));
+  VIEW=view; render(); window.scrollTo({top:0});
+}
+function easier(t){return {sentence:'recall',recall:'context',fill:'context',context:'mc',mc:'flash',match:'mc',flash:'flash'}[t]||'mc'}
+function renderSession(){
+  renderNav();
+  if(SES.i>=SES.items.length) return renderSummary();
+  const it=SES.items[SES.i];
+  if(SES.kind==='challenge'&&!it.type) fillChallenge(it);
+  CUR={it,done:false};
+  const n=SES.items.length;
+  const head=SES.kind==='challenge'?`<div class="score"><div>Puntos <b class="num">${SES.score}</b></div><div class="streak">Racha <b class="num">${SES.streak}</b></div><div>Dificultad <span class="tier">${[1,2,3].map(t=>`<i class="${t<=SES.tier?'on':''}"></i>`).join('')}</span></div></div>`:'';
+  $('#view').innerHTML=`
+   <section class="sess-head">
+     <div class="sess-top"><button class="btn ghost sm" data-act="exitSession">${ic('arrowL')} Salir</button><span class="small muted num">${esc(SES.title)} · ${SES.i+1} de ${n}</span></div>
+     <div class="bar"><i style="width:${SES.i/n*100}%"></i></div>${head}
+   </section>
+   <section class="card ex fade-in" id="ex">${EX[it.type].html(it)}</section>
+   <section id="fb" hidden></section>`;
+  EX[it.type].mount?.(it);
+  const inp=$('#ans'); if(inp){inp.focus({preventScroll:true});inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault(); if(CUR.done) next(); else check()}})}
+}
+function sessResult(id,type,ok,o={}){
+  record(id,type,ok,o);
+  SES.res.push({id,type,ok});
+  if(SES.kind==='challenge'){
+    if(ok){SES.streak++;SES.best=Math.max(SES.best,SES.streak);SES.wrongRow=0;SES.score+=Math.round(10*SES.tier*(1+Math.min(SES.streak-1,5)*.1));if(SES.streak%3===0&&SES.tier<3)SES.tier++}
+    else{SES.streak=0;SES.wrongRow++;if(SES.wrongRow>=2&&SES.tier>1){SES.tier--;SES.wrongRow=0}}
+  } else if(!ok&&!CUR.it.retry&&type!=='match'){
+    const pos=Math.min(SES.items.length,SES.i+3);
+    SES.items.splice(pos,0,{id,type:easier(type),retry:true,pool:CUR.it.pool});
+  }
+}
+function showFeedbackRaw(inner,cls,showMini){
+  CUR.done=true;
+  const fb=$('#fb'); fb.hidden=false;
+  const w=BY[CUR.it.id];
+  fb.innerHTML=`<div class="stack">${inner}${showMini&&w&&CUR.it.type!=='sentence'?`<div class="card flat stack"><p class="eyebrow">Repaso rápido</p>${miniCard(w)}<p class="small muted">Volverás a ver esta palabra en unos minutos con otro ejercicio.</p></div>`:''}<div class="row"><button class="btn primary" data-act="next" id="nextBtn">${SES.i+1>=SES.items.length?'Ver resultados':'Siguiente'} ${ic('arrowR')}</button><span class="small muted">o pulsa Enter</span></div></div>`;
+  $('#nextBtn').focus({preventScroll:true});
+  fb.scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function feedback(ok,body,partial){
+  const head=ok?(partial?'Correcto, con un detalle':pick(['Correcto','¡Bien hecho!','Exacto'])):'Todavía no';
+  showFeedbackRaw(`<div class="fb ${ok?(partial?'warn':'ok'):'bad'}"><div class="fb-head">${ic(ok?(partial?'warn':'ok'):'bad')} ${head}</div><div class="fb-body">${body}</div></div>`,'',!ok&&SES.kind!=='challenge');
+}
+function next(){ if(!CUR||!CUR.done) return; SES.i++; renderSession(); window.scrollTo({top:0,behavior:'smooth'}) }
+function chooseOpt(id){
+  if(CUR.done) return; const it=CUR.it, w=BY[it.id], ok=id===it.id, o=BY[id];
+  $$('.opt').forEach(b=>{b.disabled=true;if(b.dataset.id===it.id)b.classList.add('right');else if(b.dataset.id===id)b.classList.add('wrong')});
+  sessResult(it.id,it.type,ok,{conf:ok?null:id});
+  if(it.type==='mc') feedback(ok, ok?`<p><b>${esc(w.w)}</b> = ${esc(w.es)}.</p><p>${mk(w.ex[0][0])}</p><p class="small muted">${esc(w.ex[0][1])}</p>`:`<p><b>${esc(w.w)}</b> significa <b>${esc(w.es)}</b>.</p><p>La opción que elegiste corresponde a <b>${esc(o.w)}</b>. Fíjate en la diferencia: ${esc(w.simple)}</p>`);
+  else feedback(ok, `<p class="sentence" style="font-size:1.1rem">${mk(w.ex[1][0])}</p><p class="small muted">${esc(w.ex[1][1])}</p>`+(ok?`<p>Encaja porque <b>${esc(w.w)}</b> significa “${esc(w.es)}”.</p>`:`<p>Elegiste <b>${esc(o.w)}</b> (“${esc(o.es)}”), que no encaja aquí. La palabra correcta es <b>${esc(w.w)}</b>: ${esc(w.es)}.</p>`));
+}
+function check(){
+  if(CUR.done) return; const it=CUR.it, w=BY[it.id], inp=$('#ans'); if(!inp) return;
+  const form=it.type==='fill'?formOf(w.ex[0][0]):'';
+  const r=accepts(w,inp.value,form);
+  if(r.empty){inp.focus();toast('Escribe tu respuesta primero.');return}
+  inp.readOnly=true; inp.classList.add(r.ok?'right':'wrong'); $('[data-act="check"]').disabled=true; $('#hintBtn')&&($('#hintBtn').disabled=true); $('[data-act="giveUp"]')&&($('[data-act="giveUp"]').disabled=true);
+  const guess=!r.ok?WORDS.find(x=>x.id!==w.id&&accepts(x,inp.value,'').ok):null;
+  sessResult(w.id,it.type,r.ok,{hinted:it.hinted,conf:guess?guess.id:null});
+  const formNote=it.type==='fill'&&norm(form)!==norm(baseOf(w))?`<p>En esta frase la forma es <b>${esc(form)}</b> (de <i>${esc(w.w)}</i>).</p>`:'';
+  const sent=it.type==='fill'?`<p>${mk(w.ex[0][0])}</p>`:`<p>${mk(w.ex[0][0])}</p><p class="small muted">${esc(w.ex[0][1])}</p>`;
+  if(r.ok) feedback(true, (r.typo?`<p>Lo entendimos, pero revisa la ortografía: se escribe <b>${esc(it.type==='fill'?form:w.w)}</b>.</p>`:'')+sent+formNote+(it.hinted?'<p class="small muted">Usaste la pista: cuenta como recuerdo con ayuda.</p>':''), !!r.typo);
+  else feedback(false, `<p>La respuesta era <b>${esc(it.type==='fill'?form:w.w)}</b>${it.type==='fill'&&norm(form)!==norm(baseOf(w))?` (forma de <i>${esc(w.w)}</i>)`:''}. Escribiste “${esc(inp.value)}”.</p>${guess?`<p>“${esc(inp.value)}” es otra palabra de la lista: <b>${esc(guess.w)}</b> = ${esc(guess.es)}.</p>`:''}${sent}`);
+}
+function matchClick(side,id,btn){
+  const it=CUR.it, st=it.state; if(CUR.done||st.done[id]&&side==='L') return;
+  if(side==='L'){ $$('.mitem.word').forEach(b=>b.classList.remove('sel')); btn.classList.add('sel'); st.sel=id; return }
+  if(!st.sel||btn.classList.contains('done')){ if(!st.sel) toast('Primero elige una palabra a la izquierda.'); return }
+  const L=$(`.mitem.word[data-id="${st.sel}"]`);
+  if(id===st.sel){ L.classList.remove('sel');L.classList.add('done');btn.classList.add('done');st.done[id]=1;
+    if(!st.miss[id]) {record(id,'match',true);SES.res.push({id,type:'match',ok:true})}
+  } else { btn.classList.remove('wrong');void btn.offsetWidth;btn.classList.add('wrong');
+    if(!st.miss[st.sel]){st.miss[st.sel]=1;record(st.sel,'match',false,{conf:id});SES.res.push({id:st.sel,type:'match',ok:false})}
+  }
+  st.sel=id===st.sel?null:st.sel;
+  if(Object.keys(st.done).length===it.ids.length){
+    const miss=Object.keys(st.miss);
+    CUR.it.id=miss[0]||it.ids[0];
+    feedback(!miss.length, miss.length?`<p>Te costaron: ${miss.map(m=>`<b>${esc(BY[m].w)}</b> (${esc(BY[m].es)})`).join(', ')}.</p>`:`<p>Emparejaste las ${it.ids.length} palabras a la primera.</p>`);
+    if(miss.length) miss.forEach(m=>{const pos=Math.min(SES.items.length,SES.i+2);SES.items.splice(pos,0,{id:m,type:'mc',retry:true})});
+  }
+}
+function renderSummary(){
+  const res=SES.res, ok=res.filter(r=>r.ok).length, tot=res.length||1, pct=Math.round(ok/tot*100);
+  const wrongIds=[...new Set(res.filter(r=>!r.ok).map(r=>r.id))];
+  const okIds=[...new Set(res.filter(r=>r.ok).map(r=>r.id))].filter(id=>!wrongIds.includes(id));
+  const ups=Object.keys(SES.before).filter(id=>level(id)>SES.before[id]);
+  const byType={}; res.forEach(r=>{const t=byType[r.type]||(byType[r.type]={n:0,ok:0});t.n++;if(r.ok)t.ok++});
+  if(SES.kind==='challenge'&&!SES.logged){SES.logged=1;S.best=Math.max(S.best||0,SES.score);S.challenges.push({t:Date.now(),score:SES.score,ok,n:res.length,best:SES.best});if(S.challenges.length>20)S.challenges.shift();save()}
+  const ring=`<div class="ring" style="background:conic-gradient(var(--ok) ${pct*3.6}deg, var(--line) 0)"><b class="num">${pct}%</b></div>`;
+  $('#view').innerHTML=`<section class="card stack fade-in">
+    <div class="row" style="gap:20px;flex-wrap:wrap">${ring}<div class="stack" style="flex:1;min-width:220px"><p class="eyebrow">${esc(SES.title)} · resumen</p><h1>${pct>=85?'Muy buena sesión':pct>=60?'Vas por buen camino':'Sesión útil: ya sabes qué repasar'}</h1>
+    <p class="muted">${ok} de ${res.length} respuestas correctas.${SES.kind==='challenge'?` Puntuación <b>${SES.score}</b> · mejor racha <b>${SES.best}</b> · récord ${S.best}.`:''}${ups.length?` ${ups.length} palabra${ups.length>1?'s subieron':' subió'} de nivel.`:''}</p></div></div>
+  </section>
+  <section class="grid-2">
+    <div class="card stack"><h3>Fortalezas</h3>${okIds.length?`<div class="colls">${okIds.map(id=>`<span>${esc(BY[id].w)}</span>`).join('')}</div>`:'<p class="empty">Todavía ninguna sin errores en esta sesión.</p>'}
+      ${ups.length?`<p class="small muted">Subieron de nivel: ${ups.map(id=>`<b>${esc(BY[id].w)}</b> → ${LEVELS[level(id)].n}`).join(', ')}</p>`:''}</div>
+    <div class="card stack"><h3>Para reforzar</h3>${wrongIds.length?`<div class="wl">${wrongIds.map(id=>`<div><span><b>${esc(BY[id].w)}</b> <span class="muted small">${esc(BY[id].es)}</span></span></div>`).join('')}</div><p class="small muted">Ya están en tu repaso: volverán pronto.</p>`:'<p class="empty">Sin errores. ¡Excelente!</p>'}</div>
+  </section>
+  <section class="card stack"><h3>Por tipo de ejercicio</h3>${Object.entries(byType).map(([t,v])=>hbar(TYPES[t],v.ok,v.n)).join('')}</section>
+  <div class="row"><button class="btn primary" data-act="again">${SES.kind==='challenge'?'Otro desafío':'Otra sesión'}</button>${wrongIds.length?`<button class="btn" data-act="drill" data-ids="${wrongIds.join(',')}">Practicar mis errores</button>`:''}<button class="btn ghost" data-act="go" data-v="home">Volver al inicio</button></div>`;
+}
+
+/* ---------- Construcción de sesiones ---------- */
+function studiedIds(){return WORDS.filter(w=>level(w.id)>=1).map(w=>w.id)}
+function poolFor(sel){
+  if(sel==='hard') return WORDS.filter(w=>{const p=S.p[w.id];return p&&(p.hard||p.wrong>0)}).map(w=>w.id);
+  if(sel==='all') return WORDS.map(w=>w.id);
+  const s=studiedIds(); return s.length>=6?s:WORDS.map(w=>w.id);
+}
+function typeFor(id){
+  const L=level(id), p=S.p[id]; const lastWrong=p&&p.hist.length&&!p.hist[p.hist.length-1][2];
+  const tiers=[['flash'],['mc','context','flash'],['context','fill','mc'],['recall','fill','context'],['recall','sentence','fill'],['recall','context','sentence']];
+  let t=L; if(lastWrong) t=Math.max(0,t-1);
+  return pick(tiers[t]);
+}
+function prioritize(ids,n){
+  const now=Date.now();
+  return ids.map(id=>{const p=S.p[id];const due=p&&p.seen&&p.due<=now?3:0;return {id,s:due+(p?p.wrong*.6+p.hard*2:0)+(5-level(id))*.5+Math.random()*2}}).sort((a,b)=>b.s-a.s).slice(0,n).map(x=>x.id);
+}
+function buildPractice(type,sel,n=10){
+  const pool=poolFor(sel);
+  if(!pool.length){toast('No hay palabras en ese grupo todavía.');return null}
+  if(type==='match'){const ids=shuffle(prioritize(pool,Math.min(15,pool.length)));const items=[];for(let i=0;i+2<=ids.length&&items.length<3;i+=5)items.push({type:'match',ids:ids.slice(i,i+5),id:ids[i]});return items}
+  const ids=prioritize(pool,Math.min(n,pool.length));
+  let items=ids.map(id=>({id,type:type==='mixed'?typeFor(id):type,pool}));
+  if(type==='mixed'){
+    const low=ids.filter(id=>level(id)<=2); if(low.length>=4) items.splice(Math.floor(items.length/2),0,{type:'match',ids:shuffle(low).slice(0,5),id:low[0]});
+    const rank={flash:0,mc:1,match:2,context:2,fill:3,recall:4,sentence:5}; items.sort((a,b)=>rank[a.type]-rank[b.type]);
+  }
+  return items;
+}
+function startPractice(type,sel){
+  const items=buildPractice(type,sel||LIB.pool||'studied'); if(!items) return;
+  startSession('practice',type,items,type==='mixed'?'Práctica mixta':TYPES[type]);
+}
+function startReview(){
+  const d=dueList(); if(!d.length){toast('No tienes palabras pendientes de repaso.');return}
+  const items=d.slice(0,15).map(x=>{const L=level(x.id);const t=L>=3?pick(['recall','fill','sentence']):L>=2?pick(['fill','context','recall']):pick(['mc','context']);return {id:x.id,type:t}});
+  items.forEach(it=>{P(it.id).saved=0}); save();
+  startSession('review','review',items,'Repaso');
+}
+function fillChallenge(it){
+  const used=new Set(SES.items.filter(x=>x.id).map(x=>x.id));
+  const studied=studiedIds(); const src=studied.length>=8&&Math.random()<.75?studied:WORDS.map(w=>w.id);
+  const cand=src.filter(id=>!used.has(id)); const id=pick(cand.length?cand:src);
+  it.id=id; SES.before[id]=level(id); it.type=pick(SES.tier===1?['mc','context']:SES.tier===2?['context','fill']:['recall','fill']);
+}
+function startChallenge(){startSession('challenge','challenge',Array.from({length:12},()=>({})),'Desafío')}
+
+/* ---------- Vistas: Practicar / Repaso / Desafío ---------- */
+function viewPractice(){
+  const s=studiedIds().length, pool=LIB.pool||'studied';
+  const hardN=WORDS.filter(w=>{const p=S.p[w.id];return p&&(p.hard||p.wrong>0)}).length;
+  const tiles=[
+   ['mixed','Mixta adaptativa','Elige el ejercicio según tu nivel en cada palabra. Recomendada.','Todo'],
+   ['flash','Flashcards','Ves la palabra, piensas su significado y giras la tarjeta.','Reconocer'],
+   ['mc','Opción múltiple','Una palabra y cuatro significados posibles.','Reconocer'],
+   ['match','Emparejar','Une 5 palabras con sus explicaciones en inglés.','Reconocer'],
+   ['context','Desafío de contexto','Una frase con un hueco y cuatro palabras candidatas.','Comprender'],
+   ['fill','Completar la frase','Escribe la palabra que falta, en la forma correcta.','Recordar'],
+   ['recall','Recuerdo activo','Ves el significado y escribes la palabra, sin opciones.','Recordar'],
+   ['sentence','Crear frases','Escribes una frase propia y recibes corrección.','Producir']];
+  return `<section class="card stack"><p class="eyebrow">Modo de práctica</p><h1>Practicar</h1>
+    <p class="muted">Sesiones de 10 palabras. Si fallas, verás un repaso rápido y la palabra volverá con un ejercicio más sencillo.</p>
+    <div class="row"><span class="small muted">Palabras:</span><div class="filters" role="group" aria-label="Grupo de palabras">
+      <button data-act="pool" data-p="studied" aria-pressed="${pool==='studied'}">Estudiadas (${s})</button>
+      <button data-act="pool" data-p="hard" aria-pressed="${pool==='hard'}">Difíciles (${hardN})</button>
+      <button data-act="pool" data-p="all" aria-pressed="${pool==='all'}">Todas (${WORDS.length})</button></div></div>
+    ${s<6&&pool==='studied'?'<p class="note">Aún has estudiado menos de 6 palabras, así que se usarán todas. Te recomendamos estudiar primero una estación.</p>':''}
+  </section>
+  <section class="quick">${tiles.map(([t,n,d,k])=>`<button class="qa" data-act="startPractice" data-t="${t}" ${t==='mixed'?'style="border-color:var(--accent)"':''}><span class="chip">${k}</span><b>${n}</b><span>${d}</span></button>`).join('')}</section>`;
+}
+function viewReview(){
+  const d=dueList(), now=Date.now();
+  const soon=WORDS.filter(w=>{const p=S.p[w.id];return p&&p.seen&&p.due>now}).sort((a,b)=>S.p[a.id].due-S.p[b.id].due).slice(0,8);
+  const reason=id=>{const p=S.p[id];const r=[];if(p.saved)r.push('<span class="chip saved">Guardada</span>');if(p.hard)r.push('<span class="chip hard">Difícil</span>');const od=Math.floor((now-p.due)/DAY);if(p.seen&&p.due<=now)r.push(`<span class="chip">${od>=1?`Atrasada ${od} d`:'Toca hoy'}</span>`);return r.join(' ')};
+  return `<section class="card stack"><p class="eyebrow">Repetición espaciada</p><h1>Repaso</h1>
+    <p class="muted">Cada acierto aleja el siguiente repaso (1 → 2 → 4 → 7 → 14 → 30 → 60 días). Cada fallo trae la palabra de vuelta en 10 minutos. Primero salen las más difíciles y las más atrasadas.</p>
+    <div class="row"><button class="btn primary" data-act="startReview" ${d.length?'':'disabled'}>Empezar repaso (${Math.min(15,d.length)})</button><span class="small muted">${d.length} pendientes en total</span></div>
+  </section>
+  <section class="grid-2">
+    <div class="card stack"><h3>Pendientes ahora</h3>${d.length?`<div class="wl">${d.slice(0,15).map(x=>`<div><button data-act="openWord" data-id="${x.id}">${esc(BY[x.id].w)}</button><span class="row" style="gap:6px">${reason(x.id)}</span></div>`).join('')}</div>`:'<p class="empty">Nada pendiente. Estudia una estación nueva o practica.</p>'}</div>
+    <div class="card stack"><h3>Próximos repasos</h3>${soon.length?`<div class="wl">${soon.map(w=>`<div><button data-act="openWord" data-id="${w.id}">${esc(w.w)}</button><span class="small muted num">${fmtWhen(S.p[w.id].due)}</span></div>`).join('')}</div>`:'<p class="empty">Aparecerán cuando practiques palabras.</p>'}</div>
+  </section>
+  <section class="card stack"><h3>Dónde se guarda tu progreso</h3><p class="small muted">${store.mode==='cloud'?'Tu progreso se guarda en tu cuenta de Claude, de forma privada: lo encontrarás al volver a abrir esta página, también desde otro dispositivo.':'En esta vista el progreso se guarda solo en este navegador. Si cambias de dispositivo o borras los datos del navegador, se perdería.'} Por seguridad, puedes copiar un código de respaldo en <button class="btn ghost sm" data-act="go" data-v="progress">Progreso</button>.</p></section>`;
+}
+function fmtWhen(t){const d=Math.round((t-Date.now())/DAY);if(d<=0){const m=Math.max(1,Math.round((t-Date.now())/6e4));return m<60?`en ${m} min`:'hoy'}return d===1?'mañana':`en ${d} días`}
+function viewChallenge(){
+  const last=S.challenges.slice(-5).reverse();
+  return `<section class="card stack"><p class="eyebrow">Modo desafío</p><h1>Desafío</h1>
+    <p class="muted">12 preguntas al azar. Empiezan con opciones y, si encadenas aciertos, pasan a escribir sin ayuda. Los puntos suben con la dificultad y la racha. Después de cada respuesta verás la explicación.</p>
+    <div class="row"><button class="btn signal" data-act="startChallenge">${ic('challenge')} Empezar desafío</button>${S.best?`<span class="chip num">Récord: ${S.best} pts</span>`:''}</div></section>
+  ${last.length?`<section class="card stack"><h3>Últimos desafíos</h3><div class="wl">${last.map(c=>`<div><span class="num">${new Date(c.t).toLocaleDateString('es')} · ${c.ok}/${c.n} correctas · racha ${c.best}</span><b class="num">${c.score} pts</b></div>`).join('')}</div></section>`:''}`;
+}
+
+/* ---------- Fichas ---------- */
+const FILTERS=[['all','Todas'],['0','Nuevas'],['1','En aprendizaje'],['2','Con ayuda'],['3','Sin ayuda'],['4','En frases'],['5','Dominadas'],['hard','Difíciles'],['saved','Guardadas']];
+function libMatches(w){
+  const q=norm(LIB.q); if(q&&!norm(w.w).includes(q)&&!norm(w.es).includes(q)) return false;
+  const f=LIB.f, p=S.p[w.id];
+  if(f==='all') return true; if(f==='hard') return !!(p&&p.hard); if(f==='saved') return !!(p&&p.saved);
+  return level(w.id)===+f;
+}
+function viewCards(){
+  return `<section class="card stack"><p class="eyebrow">Fichas de vocabulario</p><h1>Fichas</h1><p class="muted">Abre una palabra y revela su información paso a paso. Intenta adivinar cada sección antes de revelarla.</p></section>
+  <section class="lib ${LIB.sel?'detail-open':''}" id="lib">
+    <div class="lib-list card">
+      <input class="search" id="q" type="search" placeholder="Buscar en inglés o español" value="${esc(LIB.q)}" aria-label="Buscar palabra">
+      <div class="filters" id="filters">${FILTERS.map(([k,l])=>`<button data-act="filter" data-f="${k}" aria-pressed="${LIB.f===k}">${l}</button>`).join('')}</div>
+      <div class="wlist" id="wlist"></div>
+    </div>
+    <div id="detail">${LIB.sel?detailHTML(LIB.sel):`<div class="card"><p class="empty">Elige una palabra de la lista para abrir su ficha.</p></div>`}</div>
+  </section>`;
+}
+function renderWlist(){
+  const list=WORDS.filter(libMatches);
+  $('#wlist').innerHTML=list.length?list.map(w=>`<button class="wbtn" data-act="openWord" data-id="${w.id}" ${LIB.sel===w.id?'aria-current="true"':''}><i class="sw" style="background:var(--lv${level(w.id)})"></i><span>${esc(w.w)}</span></button>`).join(''):'<p class="empty">Ninguna palabra coincide.</p>';
+}
+function mountCards(){ renderWlist(); const q=$('#q'); q.addEventListener('input',()=>{LIB.q=q.value;renderWlist()}) }
+function detailHTML(id){
+  const w=BY[id], p=P(id), L=level(id), o=LIB.open[id]||{};
+  const sec=(k,label,content)=>`<div class="sec"><div class="sec-h"><p class="eyebrow">${label}</p></div>${o[k]?`<div class="fade-in stack" style="gap:8px">${content}</div>`:`<button class="reveal" data-act="revealSec" data-id="${id}" data-k="${k}">Revelar: ${label.toLowerCase()}</button>`}</div>`;
+  return `<article class="card stack fade-in" style="gap:16px">
+    <div class="row" style="justify-content:space-between"><button class="btn ghost sm" data-act="closeWord">${ic('arrowL')} Lista</button><span class="chip"><i class="sw" style="background:var(--lv${L})"></i>${LEVELS[L].n}</span></div>
+    <div class="word-head"><div style="flex:1;min-width:0"><div class="w">${esc(w.w)}</div><div class="meta"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span>${p.hard?'<span class="chip hard">Difícil</span>':''}${p.saved?'<span class="chip saved">Guardada</span>':''}${p.known?'<span class="chip ok">Marcada como aprendida</span>':''}</div></div>${spk(w.w)}</div>
+    ${p.seen?`<p class="small muted">${p.due>Date.now()?`Próximo repaso ${fmtWhen(p.due)}.`:'Toca repasarla.'} Aciertos ${p.hist.filter(h=>h[2]).length} · errores ${p.wrong}.</p>`:''}
+    ${sec('es','Significado','<p style="font-size:1.15rem">'+esc(w.es)+'</p>')}
+    ${sec('simple','Explicación sencilla','<p>'+esc(w.simple)+'</p><p class="small muted">Definición del material: '+esc(w.def)+'</p>')}
+    ${sec('ctx','Ejemplo del material','<p>'+esc(w.exM)+'</p><p class="note">La frase original de la lectura no está incluida en el material; esta es la frase de ejemplo que trae la lista.</p>')}
+    ${sec('ex','Ejemplos en contexto',w.ex.map(e=>`<div class="ex-line"><p>${mk(e[0])} ${spk(plain(e[0]))}</p><p class="tr">${esc(e[1])}</p></div>`).join(''))}
+    ${sec('col','Combinaciones frecuentes','<div class="colls">'+w.col.map(c=>`<span>${esc(c)}</span>`).join('')+'</div>')}
+    ${sec('syn','Sinónimos y diferencias','<p>'+esc(w.syn)+'</p>')}
+    ${sec('err','Errores comunes','<p>'+esc(w.err)+'</p>')}
+    ${sec('hook','Truco para recordar','<p class="hook">'+esc(w.hook)+'</p>')}
+    <div class="row"><button class="btn sm" data-act="revealAll" data-id="${id}">Revelar todo</button></div>
+    <div class="foot" style="border-top:1px solid var(--line);padding-top:14px">
+      <button class="btn sm ${p.known?'':'primary'}" data-act="markKnown" data-id="${id}">${ic('check')} ${p.known?'Quitar «aprendida»':'Marcar como aprendida'}</button>
+      <button class="btn sm" data-act="toggleSaved" data-id="${id}">${ic('bookmark')} ${p.saved?'Quitar del repaso':'Guardar para repasar'}</button>
+      <button class="btn sm" data-act="toggleHard" data-id="${id}">${ic('flag')} ${p.hard?'Quitar «difícil»':'Difícil'}</button>
+      <button class="btn sm" data-act="drill" data-ids="${id}">Practicar esta palabra</button>
+    </div>
+    ${p.known?'<p class="small muted">Marcarla como aprendida la deja en el repaso dentro de 2 días: el sistema comprobará que la recuerdas sin ayuda antes de darla por dominada.</p>':''}
+  </article>`;
+}
+function refreshDetail(){ if(VIEW!=='cards') return; $('#detail').innerHTML=LIB.sel?detailHTML(LIB.sel):''; $('#lib').classList.toggle('detail-open',!!LIB.sel); renderWlist() }
+
+/* ---------- Progreso ---------- */
+function hbar(label,ok,n){const pct=n?Math.round(ok/n*100):0;return `<div class="hbar"><span>${esc(label)}</span><span class="track"><i style="width:${pct}%;background:${pct>=80?'var(--ok)':pct>=50?'var(--accent)':'var(--bad)'}"></i></span><span class="v">${n?pct+'%':'—'} <small>(${ok}/${n})</small></span></div>`}
+function viewProgress(){
+  const c=counts(), now=Date.now();
+  const seen=WORDS.filter(w=>S.p[w.id]&&S.p[w.id].hist.length);
+  const best=[...seen].map(w=>{const p=S.p[w.id];const okN=p.hist.filter(h=>h[2]).length;return {w,s:level(w.id)*10+p.box*2+okN-p.wrong*3}}).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).slice(0,8);
+  const confused=[...seen].filter(w=>S.p[w.id].wrong>0).sort((a,b)=>S.p[b.id].wrong-S.p[a.id].wrong).slice(0,8);
+  const pairs=[]; WORDS.forEach(w=>{const p=S.p[w.id];if(p)Object.entries(p.conf).forEach(([o,n])=>{if(BY[o])pairs.push({a:w,b:BY[o],n})})}); pairs.sort((x,y)=>y.n-x.n);
+  const typeRows=Object.keys(TYPES).map(t=>{const v=S.types[t]||{n:0,ok:0};return hbar(TYPES[t],v.ok,v.n)}).join('');
+  const days=Array.from({length:7},(_,i)=>{const start=new Date();start.setHours(0,0,0,0);const a=start.getTime()+i*DAY,b=a+DAY;const n=WORDS.filter(w=>{const p=S.p[w.id];return p&&p.seen&&(i===0?p.due<b:p.due>=a&&p.due<b)}).length;return {n,label:i===0?'Hoy':new Date(a).toLocaleDateString('es',{weekday:'short'})}});
+  const maxD=Math.max(1,...days.map(d=>d.n));
+  const act=Array.from({length:14},(_,i)=>{const k=dayKey(now-(13-i)*DAY);return S.daily[k]||0}); const maxA=Math.max(1,...act);
+  const sents=Object.entries(S.sent).flatMap(([id,a])=>a.map(s=>({...s,id}))).sort((a,b)=>b.t-a.t).slice(0,8);
+  return `<section class="card stack"><p class="eyebrow">Panel de progreso</p><h1>Progreso</h1>${levelBar(c)}</section>
+  <section class="grid-2">
+    <div class="card stack"><h3>Las que mejor recuerdas</h3>${best.length?`<div class="wl">${best.map(x=>`<div><button data-act="openWord" data-id="${x.w.id}">${esc(x.w.w)}</button><span class="chip"><i class="sw" style="background:var(--lv${level(x.w.id)})"></i>${LEVELS[level(x.w.id)].n}</span></div>`).join('')}</div>`:'<p class="empty">Aparecerán cuando practiques.</p>'}</div>
+    <div class="card stack"><h3>Las que más te cuestan</h3>${confused.length?`<div class="wl">${confused.map(w=>`<div><button data-act="openWord" data-id="${w.id}">${esc(w.w)}</button><span class="small muted num">${S.p[w.id].wrong} error${S.p[w.id].wrong>1?'es':''}</span></div>`).join('')}</div><button class="btn sm" data-act="drill" data-ids="${confused.map(w=>w.id).join(',')}" style="justify-self:start">Practicar estas palabras</button>`:'<p class="empty">Sin errores registrados todavía.</p>'}</div>
+  </section>
+  <section class="grid-2">
+    <div class="card stack"><h3>Confusiones frecuentes</h3><p class="small muted">Palabras que elegiste o escribiste en lugar de la correcta.</p>${pairs.length?`<div class="wl">${pairs.slice(0,8).map(x=>`<div><span><b>${esc(x.a.w)}</b> <span class="muted">↔</span> <b>${esc(x.b.w)}</b></span><span class="small muted num">${x.n}×</span></div>`).join('')}</div>`:'<p class="empty">Ninguna confusión registrada.</p>'}</div>
+    <div class="card stack"><h3>Resultados por tipo de ejercicio</h3>${typeRows}</div>
+  </section>
+  <section class="grid-2">
+    <div class="card stack"><h3>Repasos de los próximos 7 días</h3><div class="cols">${days.map(d=>`<div class="colb"><b>${d.n}</b><i style="height:${d.n/maxD*100}%"></i><small>${esc(d.label)}</small></div>`).join('')}</div></div>
+    <div class="card stack"><h3>Actividad (últimos 14 días)</h3><div class="cols" style="grid-template-columns:repeat(14,minmax(0,1fr))">${act.map((n,i)=>`<div class="colb"><b>${n||''}</b><i style="height:${n/maxA*100}%;background:var(--lv2)"></i><small>${i===13?'hoy':''}</small></div>`).join('')}</div><p class="small muted">Respuestas por día.</p></div>
+  </section>
+  <section class="card stack"><h3>Tus frases recientes</h3>${sents.length?`<div class="wl">${sents.map(s=>`<div><span><b>${esc(BY[s.id]?.w||'')}</b> — “${esc(s.text)}”</span><span class="chip ${s.ok?'ok':'hard'}">${s.ok?'Correcta':'A revisar'}</span></div>`).join('')}</div>`:'<p class="empty">Cuando escribas frases propias aparecerán aquí.</p>'}</section>
+  <section class="card stack"><h3>Copia de seguridad</h3>
+    <p class="small muted">${store.mode==='cloud'?'Tu progreso ya se guarda en tu cuenta. ':'El progreso se guarda solo en este navegador. '}Copia este código y guárdalo donde quieras; pégalo aquí para restaurar tu progreso en cualquier navegador.</p>
+    <div class="row"><button class="btn sm" data-act="copyCode">Copiar código de respaldo</button></div>
+    <div id="codeOut"></div>
+    <label class="small muted" for="restore">Restaurar desde un código</label>
+    <textarea id="restore" style="min-height:70px" placeholder="Pega aquí tu código de respaldo"></textarea>
+    <div class="row"><button class="btn sm" data-act="restore">Restaurar</button><button class="btn ghost sm" data-act="reset" id="resetBtn">Reiniciar todo el progreso</button></div>
+  </section>`;
+}
+const encode=()=>btoa(unescape(encodeURIComponent(JSON.stringify(S))));
+function decode(s){const o=JSON.parse(decodeURIComponent(escape(atob(s.trim()))));if(!o||o.v!==1||typeof o.p!=='object')throw 0;return Object.assign(fresh(),o)}
+
+/* ---------- Acciones ---------- */
+const ACT={
+ go:b=>go(b.dataset.v),
+ speak:b=>speak(b.dataset.t),
+ block:b=>startBlock(b.dataset.b),
+ exitStudy:()=>{ST=null;go('study');render()},
+ step:b=>{ST.step=+b.dataset.s;if(ST.step!==3){delete ST.rev.recall;delete ST.rev.rated}renderStudy()},
+ studyNext:()=>studyMove(1), studyPrev:()=>studyMove(-1),
+ rev:b=>{ST.rev[b.dataset.k]=1;renderStudy()},
+ studyRate:b=>{const id=BLOCKS[ST.b][ST.wi],r=b.dataset.r;record(id,'flash',r!=='again',{weak:r==='hard'});if(r==='again'){P(id).hard=1;save()}ST.rev.rated=1;toast(r==='good'?'¡Bien! Ahora escribe una frase.':'Anotado: la repasarás pronto.');ST.step=4;renderStudy()},
+ toggleHard:b=>{const p=P(b.dataset.id);p.hard=p.hard?0:1;save();toast(p.hard?'Marcada como difícil.':'Ya no está marcada como difícil.');if(ST)renderStudy();else refreshDetail()},
+ toggleSaved:b=>{const p=P(b.dataset.id);p.saved=p.saved?0:1;save();renderNav();toast(p.saved?'Guardada para tu próximo repaso.':'Quitada del repaso.');refreshDetail()},
+ markKnown:b=>{const p=P(b.dataset.id);if(p.known){p.known=0}else{p.known=1;p.seen=1;p.box=Math.max(p.box,2);p.due=Date.now()+2*DAY}save();toast(p.known?'Marcada como aprendida. Se verificará en el repaso.':'Marca quitada.');refreshDetail()},
+ practiceBlock:b=>{const ids=BLOCKS[+b.dataset.b];const items=[{type:'match',ids:shuffle(ids).slice(0,5),id:ids[0]}].concat(shuffle(ids).map(id=>({id,type:'mc',pool:ids})),shuffle(ids).map(id=>({id,type:'context',pool:ids})),shuffle(ids).map(id=>({id,type:'recall'})));ST=null;startSession('practice','block',items,`Práctica · Estación ${+b.dataset.b+1}`)},
+ startPractice:b=>startPractice(b.dataset.t||'mixed'),
+ startReview:()=>startReview(),
+ startChallenge:()=>startChallenge(),
+ pool:b=>{LIB.pool=b.dataset.p;render()},
+ exitSession:()=>{const v=SES.view;SES=null;go(v);render()},
+ again:()=>{const k=SES.kind,v=SES.view;SES=null;if(k==='challenge')startChallenge();else if(k==='review'){VIEW='review';dueList().length?startReview():render()}else{VIEW='practice';startPractice(k==='block'?'mixed':k)}},
+ drill:b=>{const ids=b.dataset.ids.split(',').filter(id=>BY[id]);const items=[];ids.forEach(id=>{const L=level(id);items.push({id,type:L>=2?'context':'mc'});items.push({id,type:L>=3?'sentence':'recall'})});const ord={mc:0,context:1,recall:2,sentence:3};items.sort((a,b)=>ord[a.type]-ord[b.type]);SES=null;startSession('practice','mixed',items,ids.length===1?`Práctica · ${BY[ids[0]].w}`:'Práctica de errores')},
+ opt:b=>chooseOpt(b.dataset.id),
+ check:()=>check(),
+ hint:()=>{const it=CUR.it,w=BY[it.id];it.hinted=1;const f=formOf(w.ex[0][0]);$('#hintOut').textContent=`Empieza por «${f[0]}» y tiene ${f.replace(/[^a-zA-Z]/g,'').length} letras.`;$('#hintBtn').disabled=true;$('#ans').focus()},
+ giveUp:()=>{if(CUR.done)return;const w=BY[CUR.it.id];sessResult(w.id,CUR.it.type,false);$('#ans').readOnly=true;$('[data-act="check"]').disabled=true;feedback(false,`<p>La palabra es <b>${esc(w.w)}</b>.</p><p>${mk(w.ex[0][0])}</p>`)},
+ next:()=>next(),
+ flip:()=>{$('#flash').classList.add('flipped');$('#flashActs').innerHTML=`<p class="small muted">¿Lo sabías?</p><div class="row"><button class="btn" data-act="rate" data-r="again">No la sabía</button><button class="btn" data-act="rate" data-r="hard">Con dudas</button><button class="btn primary" data-act="rate" data-r="good">La sabía</button></div>`},
+ rate:b=>{if(CUR.done)return;const r=b.dataset.r,w=BY[CUR.it.id];sessResult(w.id,'flash',r!=='again',{weak:r==='hard'});$('#flashActs').innerHTML='';feedback(r!=='again',r==='again'?`<p>Sin problema: ahora la conoces mejor. Volverá en unos minutos.</p>`:`<p>${r==='hard'?'La repasarás un poco antes.':'Perfecto.'} Recuerda que reconocerla no es lo mismo que recordarla: más adelante te la pediremos sin ayuda.</p>`)},
+ mL:b=>matchClick('L',b.dataset.id,b), mR:b=>matchClick('R',b.dataset.id,b),
+ sbSubmit:b=>submitSentence(b.dataset.id,b.dataset.ctx),
+ sbRetry:()=>renderStudy(),
+ selfOk:b=>{saveSentence(b.dataset.id,CUR_SB.text,true,'self');sentenceDone(b.dataset.id,true,b.dataset.ctx,`<div class="fb ok"><div class="fb-head">${ic('ok')} Frase registrada</div><p>Anotada como correcta según tu autoevaluación.</p></div>`)},
+ selfBad:b=>{saveSentence(b.dataset.id,CUR_SB.text,false,'self');if(b.dataset.ctx==='study'){$('#sbText').readOnly=false;$('[data-act="sbSubmit"]').disabled=false;$('#sbOut').innerHTML='<p class="note">Corrige tu frase y vuelve a evaluarla.</p>';$('#sbText').focus()}else sentenceDone(b.dataset.id,false,'session',`<div class="fb bad"><div class="fb-head">${ic('bad')} A revisar</div><p>La practicarás de nuevo pronto.</p></div>`)},
+ filter:b=>{LIB.f=b.dataset.f;$$('#filters button').forEach(x=>x.setAttribute('aria-pressed',x===b));renderWlist()},
+ openWord:b=>{LIB.sel=b.dataset.id;if(VIEW!=='cards'){go('cards')}else{refreshDetail();if(innerWidth<860)window.scrollTo({top:0})}},
+ closeWord:()=>{LIB.sel=null;refreshDetail();$('#detail').innerHTML='<div class="card"><p class="empty">Elige una palabra de la lista para abrir su ficha.</p></div>'},
+ revealSec:b=>{const o=LIB.open[b.dataset.id]||(LIB.open[b.dataset.id]={});o[b.dataset.k]=1;P(b.dataset.id).seen=1;save();refreshDetail()},
+ revealAll:b=>{LIB.open[b.dataset.id]={es:1,simple:1,ctx:1,ex:1,col:1,syn:1,err:1,hook:1};P(b.dataset.id).seen=1;save();refreshDetail()},
+ copyCode:()=>{const code=encode();const out=$('#codeOut');out.innerHTML=`<div class="code" id="codeBox" tabindex="0">${esc(code)}</div>`;const sel=()=>{const r=document.createRange();r.selectNodeContents($('#codeBox'));const s=getSelection();s.removeAllRanges();s.addRange(r)};try{navigator.clipboard.writeText(code).then(()=>toast('Código copiado.'),()=>{sel();toast('Selecciona y copia el código manualmente.')})}catch(e){sel();toast('Selecciona y copia el código manualmente.')}},
+ restore:()=>{try{S=decode($('#restore').value);save();if(store.ref)pushCloud();toast('Progreso restaurado.');render()}catch(e){toast('El código no es válido. Cópialo completo e inténtalo de nuevo.')}},
+ reset:b=>{if(b.dataset.armed){S=fresh();save();if(store.ref)pushCloud();toast('Progreso reiniciado.');render()}else{b.dataset.armed=1;b.textContent='Pulsa otra vez para confirmar';b.classList.remove('ghost');b.style.color='var(--bad)';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Reiniciar todo el progreso';b.classList.add('ghost');b.style.color=''}},4000)}}
+};
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b,e)}});
+document.addEventListener('keydown',e=>{
+  if(!SES||!CUR||e.target.matches('input,textarea')) return;
+  if(e.key==='Enter'&&CUR.done){e.preventDefault();next();return}
+  if(/^[1-4]$/.test(e.key)&&!CUR.done){const b=$$('.opt')[+e.key-1];if(b){b.click()}}
+});
+if(canSpeak){try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>{}}catch(e){}}
+
+/* ---------- Arranque ---------- */
+const h=(location.hash||'').slice(1); if(NAV.some(n=>n[0]===h)) VIEW=h;
+render(); renderSaveState();
+setTimeout(()=>{ initCloud(); if(window.claude&&typeof window.claude.use==='function') window.claude.use('sample').then(s=>{sampleFn=s}).catch(()=>{}); },0);
+})();
+</script>
