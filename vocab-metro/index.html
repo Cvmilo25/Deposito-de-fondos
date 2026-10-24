@@ -62,6 +62,7 @@ mark{background:var(--signal);color:var(--signal-ink);padding:0 .2em;border-radi
 .save-state{margin-left:auto;font-size:.78rem;color:var(--muted);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .save-state .dot{width:8px;height:8px;border-radius:50%;background:var(--warn)}
 .save-state.cloud .dot{background:var(--ok)}
+@media (min-width:761px) and (max-width:1240px){ .save-state span:last-child{display:none} .nav button{padding:8px 10px} }
 @media (max-width:760px){ .top-in{gap:8px} .nav{order:3;flex-basis:100%} .nav button span.lbl-long{display:none} }
 
 main{max-width:1120px;margin:0 auto;padding-block:24px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:24px}
@@ -160,6 +161,35 @@ main{max-width:1120px;margin:0 auto;padding-block:24px 64px;padding-left:max(16p
 .colls span{background:var(--accent-soft);color:var(--ink);border-radius:8px;padding:3px 10px;font-size:.92rem}
 .hook{background:var(--warn-soft);border-radius:var(--r-sm);padding:12px 14px}
 .fade-in{animation:fadeIn .28s ease both}
+
+/* Flashcards */
+.fc-tips{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:12px}
+.tip{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:16px;display:grid;gap:6px;align-content:start}
+.tip b{font-family:var(--f-display)}
+.tip i{font-style:normal;width:28px;height:28px;border-radius:50%;background:var(--signal);color:var(--signal-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800}
+.fc-modes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:10px}
+.fc-mode{display:grid;gap:4px;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:12px;cursor:pointer;align-content:start}
+.fc-mode > span:last-child{font-size:.86rem;color:var(--muted)}
+.fc-mode b{font-family:var(--f-display)}
+.fc-mode[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.fc-toggle{display:inline-flex;gap:8px;align-items:center;cursor:pointer;flex-wrap:wrap}
+.fc-toggle input{width:20px;height:20px;accent-color:var(--accent)}
+.fc-stage{perspective:1400px;max-width:680px;width:100%;margin:0 auto}
+.fc-card{display:grid;transition:transform .55s cubic-bezier(.2,.7,.2,1);transform-style:preserve-3d}
+.fc-card.flipped{transform:rotateY(180deg)}
+.fc-face{grid-area:1/1;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:28px 24px;display:grid;gap:12px;align-content:center;min-height:320px;min-width:0}
+.fc-front{justify-items:center;text-align:center;border-top:8px solid var(--accent)}
+.fc-back{transform:rotateY(180deg);align-content:start;border-top:8px solid var(--signal)}
+.fc-big{font-size:1.3rem;font-weight:700}
+.fc-word{font-family:var(--f-display);font-size:2rem;font-weight:800;line-height:1.05;overflow-wrap:anywhere}
+.fc-ctl{max-width:680px;width:100%;margin:0 auto;display:grid;gap:12px}
+.rate{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+@media (max-width:520px){.rate{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.rate button{display:grid;gap:2px;justify-items:center;text-align:center;border:2px solid var(--line);background:var(--surface);border-radius:var(--r-sm);padding:10px 6px;cursor:pointer;font-weight:700;min-height:56px}
+.rate button small{font-weight:400;color:var(--muted);font-size:.78rem}
+.rate button:hover{background:var(--surface-2)}
+.rate .again{border-color:var(--bad);color:var(--bad)} .rate .hard{border-color:var(--warn);color:var(--warn)}
+.rate .good{border-color:var(--ok);color:var(--ok)} .rate .easy{border-color:var(--accent);color:var(--accent)}
 @keyframes fadeIn{from{opacity:.0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* Library */
@@ -498,6 +528,7 @@ const ICON={
  practice:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".6" fill="currentColor"/>',
  review:'<path d="M4 12a8 8 0 0114-5.3L20 8"/><path d="M20 4v4h-4"/><path d="M20 12a8 8 0 01-14 5.3L4 16"/><path d="M4 20v-4h4"/>',
  challenge:'<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+ flash:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M12 5v14"/><path d="M6 10h3M15 10h3M15 14h2"/>',
  cards:'<rect x="3" y="6" width="14" height="14" rx="2"/><path d="M7 3h12a2 2 0 012 2v12"/>',
  progress:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
  sound:'<path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 010 6M18.5 6.5a8 8 0 010 11"/>',
@@ -579,6 +610,7 @@ function record(id,type,ok,o={}){
     else if(RECALL.has(type)&&!o.hinted){p.recN++; if(!p.recall.includes(k)){p.recall.push(k); if(p.recall.length>12)p.recall.shift()} p.lapse=0; p.box=Math.min(p.box+1,7)}
     else if(p.box<3) p.box++;
     if(o.weak) p.box=Math.max(1,p.box-1);
+    if(o.easy) p.box=Math.min(7,p.box+1);
     p.due=now+INTERVALS[p.box]*DAY;
   } else {
     p.wrong++; p.lapse=1; p.box=1; p.due=now+10*60*1000;
@@ -602,14 +634,14 @@ function blockState(b){
 const nextBlock=()=>{const i=BLOCKS.findIndex(ids=>ids.some(id=>level(id)===0));return i<0?0:i};
 
 /* ---------- Navegación ---------- */
-const NAV=[['home','Inicio'],['study','Estudiar'],['practice','Practicar'],['review','Repaso'],['challenge','Desafío'],['cards','Fichas'],['progress','Progreso']];
+const NAV=[['home','Inicio'],['study','Estudiar'],['flash','Flashcards'],['practice','Practicar'],['review','Repaso'],['challenge','Desafío'],['cards','Fichas'],['progress','Progreso']];
 let VIEW='home', SES=null, ST=null, LIB={q:'',f:'all',sel:null,open:{}};
 function renderNav(){
   const due=dueList().length;
   $('#nav').innerHTML=NAV.map(([v,l])=>`<button data-act="go" data-v="${v}" ${VIEW===v?'aria-current="page"':''}>${ic(v)}<span>${l}</span>${v==='review'&&due?`<span class="badge num">${due}</span>`:''}</button>`).join('');
 }
 function go(v){
-  if(VIEW!==v){ if(v!=='practice'&&v!=='review'&&v!=='challenge') SES=null; if(v!=='study') ST=null; if(SES&&SES.view!==v) SES=null; }
+  if(VIEW!==v){ if(v!=='practice'&&v!=='review'&&v!=='challenge') SES=null; if(v!=='study') ST=null; if(v!=='flash') FC=null; if(SES&&SES.view!==v) SES=null; }
   VIEW=v; render(); window.scrollTo({top:0});
   try{history.replaceState(null,'','#'+v)}catch(e){}
 }
@@ -618,7 +650,8 @@ function render(){
   const v=$('#view');
   if((VIEW==='practice'||VIEW==='review'||VIEW==='challenge')&&SES) return renderSession();
   if(VIEW==='study'&&ST) return renderStudy();
-  v.innerHTML=({home:viewHome,study:viewStudyIndex,practice:viewPractice,review:viewReview,challenge:viewChallenge,cards:viewCards,progress:viewProgress}[VIEW]||viewHome)();
+  if(VIEW==='flash'&&FC) return renderFC();
+  v.innerHTML=({home:viewHome,study:viewStudyIndex,flash:viewFlash,practice:viewPractice,review:viewReview,challenge:viewChallenge,cards:viewCards,progress:viewProgress}[VIEW]||viewHome)();
   if(VIEW==='cards') mountCards();
 }
 
@@ -673,6 +706,7 @@ function viewHome(){
   </section>
   <section class="quick">
     <button class="qa" data-act="go" data-v="study">${ic('study')}<b>Estudiar</b><span>Aprende palabras nuevas paso a paso.</span></button>
+    <button class="qa" data-act="go" data-v="flash">${ic('flash')}<b>Flashcards</b><span>Responde, gira y valora: repaso a tu ritmo.</span></button>
     <button class="qa" data-act="go" data-v="practice">${ic('practice')}<b>Practicar</b><span>7 tipos de ejercicio con corrección inmediata.</span></button>
     <button class="qa" data-act="go" data-v="review">${ic('review')}<b>Repasar</b><span>${due?`${due} palabras esperan repaso.`:'Nada pendiente ahora mismo.'}</span></button>
     <button class="qa" data-act="go" data-v="challenge">${ic('challenge')}<b>Desafío</b><span>Quiz con dificultad progresiva y racha.</span></button>
@@ -1124,6 +1158,169 @@ function detailHTML(id){
 }
 function refreshDetail(){ if(VIEW!=='cards') return; $('#detail').innerHTML=LIB.sel?detailHTML(LIB.sel):''; $('#lib').classList.toggle('detail-open',!!LIB.sel); renderWlist() }
 
+/* ---------- Flashcards ---------- */
+let FC=null;
+const FCP=()=>S.fcp||(S.fcp={src:'smart',st:0,mode:'en',size:15,type:true});
+const FC_MODES={
+ en:{n:'Inglés → español',k:'Reconocer',d:'Ves la palabra y recuerdas qué significa.'},
+ es:{n:'Español → inglés',k:'Recordar',d:'Ves el significado y recuerdas la palabra. Más difícil y más eficaz.'},
+ ctx:{n:'Contexto',k:'Comprender',d:'Ves una frase con un hueco y recuerdas qué palabra falta.'},
+ mix:{n:'Mezcla',k:'Alternar',d:'Combina las tres direcciones para fijar la palabra desde varios ángulos.'}};
+const FC_SRC=[['smart','Recomendado'],['station','Por estación'],['due','Para repasar'],['hard','Difíciles'],['saved','Guardadas'],['all','Todas al azar']];
+const FC_RATES=[['again','Otra vez','No lo recordé'],['hard','Difícil','Con esfuerzo'],['good','Bien','Lo recordé'],['easy','Fácil','Al instante']];
+function fcDeck(c){
+  const all=WORDS.map(w=>w.id); let ids;
+  if(c.src==='station') return [...BLOCKS[c.st]];
+  if(c.src==='due') ids=dueList().map(x=>x.id);
+  else if(c.src==='hard') ids=all.filter(id=>{const p=S.p[id];return p&&(p.hard||p.wrong>0)});
+  else if(c.src==='saved') ids=all.filter(id=>S.p[id]&&S.p[id].saved);
+  else if(c.src==='all') ids=shuffle(all);
+  else{
+    const due=dueList().map(x=>x.id);
+    const learning=shuffle(all.filter(id=>{const L=level(id);return L>=1&&L<=2&&!due.includes(id)}));
+    const fresh=BLOCKS[nextBlock()].filter(id=>level(id)===0).slice(0,5);
+    ids=[...due,...learning].slice(0,Math.max(0,c.size-fresh.length)).concat(fresh);
+  }
+  return [...new Set(ids)].slice(0,c.size);
+}
+function viewFlash(){
+  const c=FCP(), deck=fcDeck(c);
+  const chips=(k,list,cur)=>list.map(([v,l])=>`<button data-act="fcSet" data-k="${k}" data-v="${v}" aria-pressed="${String(cur)===String(v)}">${l}</button>`).join('');
+  const notes={smart:`Primero las que te toca repasar, luego las que estás aprendiendo y al final hasta 5 palabras nuevas de la Estación ${nextBlock()+1}.`,station:`Las ${BLOCKS[c.st].length} palabras de la Estación ${c.st+1}: ${BLOCKS[c.st].map(id=>BY[id].w).join(', ')}.`,due:'Las palabras que el calendario de repaso te pide hoy, empezando por las más difíciles.',hard:'Las que marcaste como difíciles o en las que te has equivocado alguna vez.',saved:'Las que guardaste para repasar desde las fichas.',all:'Una selección al azar de toda la lista.'};
+  const log=(S.fcLog||[]).slice(-4).reverse();
+  return `
+  <section class="card stack"><p class="eyebrow">Flashcards con enfoque educativo</p><h1>Flashcards</h1>
+    <p class="muted">Una tarjeta solo enseña si intentas recordar <b>antes</b> de girarla. Aquí respondes primero, comparas con la respuesta correcta y valoras cuánto te costó: con eso se decide cuándo vuelves a verla.</p></section>
+  <section class="fc-tips">
+    <div class="tip"><i>1</i><b>Responde antes de girar</b><span class="small muted">Dila en voz alta o escríbela. El esfuerzo de recordar es lo que fija la palabra en la memoria.</span></div>
+    <div class="tip"><i>2</i><b>Valora con honestidad</b><span class="small muted">Si dudaste, marca «Difícil». Así el repaso llega justo cuando empiezas a olvidarla.</span></div>
+    <div class="tip"><i>3</i><b>Repite hasta recordar</b><span class="small muted">Las tarjetas que marcas «Otra vez» vuelven en la misma sesión, unas tarjetas más tarde.</span></div>
+    <div class="tip"><i>4</i><b>Cambia de dirección</b><span class="small muted">Reconocer (inglés → español) es más fácil que recordar (español → inglés). Para hablar inglés necesitas las dos.</span></div>
+  </section>
+  <section class="card stack" style="gap:16px">
+    <h3>1. Elige el mazo</h3>
+    <div class="filters" role="group" aria-label="Mazo">${chips('src',FC_SRC,c.src)}</div>
+    ${c.src==='station'?`<div class="filters" role="group" aria-label="Estación">${BLOCKS.map((ids,b)=>`<button data-act="fcSet" data-k="st" data-v="${b}" aria-pressed="${c.st===b}" title="${esc(ids.map(id=>BY[id].w).join(', '))}">Estación ${b+1}</button>`).join('')}</div>`:''}
+    <p class="small muted">${esc(notes[c.src])}${deck.length?'':' Este mazo está vacío por ahora: elige otro.'}</p>
+    <h3>2. Elige la dirección</h3>
+    <div class="fc-modes" role="group" aria-label="Dirección">${Object.entries(FC_MODES).map(([k,m])=>`<button class="fc-mode" data-act="fcSet" data-k="mode" data-v="${k}" aria-pressed="${c.mode===k}"><span class="chip" style="justify-self:start">${m.k}</span><b>${m.n}</b><span>${m.d}</span></button>`).join('')}</div>
+    <h3>3. Ajustes</h3>
+    <div class="row" style="gap:16px">${c.src!=='station'?`<div class="row" style="gap:8px"><span class="small muted">Tarjetas:</span><div class="filters" role="group" aria-label="Número de tarjetas">${chips('size',[[10,'10'],[15,'15'],[20,'20']],c.size)}</div></div>`:''}
+      <label class="fc-toggle" for="fcType"><input type="checkbox" id="fcType" ${c.type?'checked':''}> Escribir mi respuesta antes de girar <span class="small muted">(recomendado)</span></label></div>
+    <p class="note">Las palabras nuevas aparecen primero en inglés → español, para que las conozcas antes de tener que recordarlas. Si escribes bien la palabra inglesa (direcciones «Español → inglés» y «Contexto»), cuenta como recuerdo sin ayuda para tu nivel de dominio; si solo la piensas, cuenta como reconocimiento.</p>
+    <div class="row"><button class="btn primary" data-act="fcStart" ${deck.length?'':'disabled'}>Empezar con ${deck.length} tarjeta${deck.length===1?'':'s'} ${ic('arrowR')}</button></div>
+  </section>
+  ${log.length?`<section class="card stack"><h3>Últimas sesiones</h3><div class="wl">${log.map(l=>`<div><span class="num">${new Date(l.t).toLocaleDateString('es')} · ${esc(FC_MODES[l.mode]?.n||'')}</span><b class="num">${l.known}/${l.n} a la primera</b></div>`).join('')}</div></section>`:''}`;
+}
+function fcStart(ids,mode){
+  const c=FCP(); ids=ids||fcDeck(c); mode=mode||c.mode; if(!ids.length) return;
+  const dirs=['en','es','ctx'];
+  FC={mode,type:c.type,i:0,flip:false,chk:null,typed:'',res:[],first:{},logged:false,
+      before:Object.fromEntries(ids.map(id=>[id,level(id)])),
+      q:shuffle(ids).map((id,i)=>{const isNew=level(id)===0;return {id,mode:isNew?'en':mode==='mix'?dirs[i%3]:mode,reps:0,isNew}})};
+  VIEW='flash'; render(); window.scrollTo({top:0});
+}
+function fcPreview(id,r,recallType){
+  if(r==='again') return '10 min';
+  const p=S.p[id]; let b=p?p.box:0;
+  if(recallType) b=Math.min(b+1,7); else if(b<3) b++;
+  if(r==='hard') b=Math.max(1,b-1); if(r==='easy') b=Math.min(7,b+1);
+  const d=INTERVALS[b]; return d<=1?'1 día':`${d} días`;
+}
+function renderFC(){
+  renderNav();
+  if(FC.i>=FC.q.length) return renderFCEnd();
+  const it=FC.q[FC.i], w=BY[it.id], m=it.mode, total=FC.q.length;
+  const pending=FC.q.slice(FC.i+1).filter(x=>x.reps>0).length;
+  const tags=`${it.isNew&&it.reps===0?'<span class="chip saved">Palabra nueva</span>':''}${it.reps>0?'<span class="chip hard">Repetición</span>':''}`;
+  const front=m==='en'?`<p class="eyebrow">¿Qué significa?</p>${tags}<div class="prompt-word">${esc(w.w)}</div><div class="row" style="justify-content:center"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span>${spk(w.w)}</div>`
+    :m==='es'?`<p class="eyebrow">¿Cuál es la palabra en inglés?</p>${tags}<p class="fc-big">${esc(w.es)}</p><p class="muted">${esc(w.simple)}</p><span class="pos">${esc(w.pos)}</span>`
+    :`<p class="eyebrow">¿Qué palabra falta?</p>${tags}<p class="sentence">${blank(w.ex[1][0])}</p><span class="pos">${esc(w.pos)}</span>`;
+  const sent=m==='ctx'?w.ex[1]:w.ex[0];
+  const back=`<div class="row" style="justify-content:space-between;align-items:flex-start;flex-wrap:nowrap"><div style="min-width:0"><div class="fc-word">${esc(w.w)}</div><div class="row" style="gap:8px;margin-top:4px"><span class="pos">${esc(w.pos)}</span><span class="ipa">${esc(w.ipa)}</span></div></div>${spk(w.w)}</div>
+    <p class="fc-big">${esc(w.es)}</p>
+    <div class="ex-line"><p>${mk(sent[0])}</p><p class="tr">${esc(sent[1])}</p></div>
+    <p class="hook small">Truco: ${esc(w.hook)}</p>
+    <details><summary class="small">Más: sinónimos y errores comunes</summary><div class="stack" style="gap:6px;margin-top:8px"><p class="small">${esc(w.syn)}</p><p class="small">${esc(w.err)}</p></div></details>`;
+  const ansLabel=m==='en'?'Escribe el significado (en español o inglés)':'Escribe la palabra en inglés';
+  $('#view').innerHTML=`
+  <section class="sess-head fc-ctl">
+    <div class="sess-top"><button class="btn ghost sm" data-act="fcExit">${ic('arrowL')} Salir</button><span class="small muted num">${esc(FC_MODES[FC.mode].n)} · tarjeta ${FC.i+1} de ${total}${pending?` · ${pending} por repetir`:''}</span></div>
+    <div class="bar"><i style="width:${FC.i/total*100}%"></i></div>
+  </section>
+  <section class="fc-stage"><div class="fc-card" id="fcCard">
+    <div class="fc-face fc-front" id="fcFront">${front}</div>
+    <div class="fc-face fc-back" id="fcBack" aria-hidden="true">${back}</div>
+  </div></section>
+  <section class="fc-ctl" id="fcCtl">
+    ${FC.type?`<div class="answer"><input id="fcAns" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="${ansLabel}" aria-label="${ansLabel}"></div>`:`<p class="small muted" style="text-align:center">Di tu respuesta en voz alta antes de girar.</p>`}
+    <div class="row" style="justify-content:center"><button class="btn primary" data-act="fcFlip">Girar tarjeta <span class="small" style="opacity:.75">(${FC.type?'Enter':'Espacio'})</span></button><button class="btn ghost" data-act="fcFlip" data-skip="1">No lo sé</button></div>
+  </section>`;
+  const inp=$('#fcAns'); if(inp){inp.focus({preventScroll:true});inp.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();fcFlip()}})}
+}
+function fcFlip(skip){
+  if(!FC||FC.flip) return;
+  const it=FC.q[FC.i], w=BY[it.id], m=it.mode;
+  FC.typed=skip?'':(($('#fcAns')||{}).value||'').trim();
+  FC.chk=FC.typed&&m!=='en'?accepts(w,FC.typed,m==='ctx'?formOf(w.ex[1][0]):''):null;
+  FC.skipped=!!skip; FC.flip=true;
+  $('#fcCard').classList.add('flipped'); $('#fcFront').setAttribute('aria-hidden','true'); $('#fcBack').removeAttribute('aria-hidden');
+  fcControls();
+}
+function fcControls(){
+  const it=FC.q[FC.i], w=BY[it.id], m=it.mode, skip=FC.skipped;
+  const recallType=!!(FC.chk&&FC.chk.ok);
+  let msg='';
+  if(FC.chk) msg=FC.chk.ok?`<div class="fb ok"><div class="fb-head">${ic('ok')} Escribiste «${esc(FC.typed)}»: correcto</div>${FC.chk.typo?`<p class="small">Revisa la ortografía: <b>${esc(FC.chk.typo)}</b>.</p>`:''}<p class="small">${FC.chk.manual?'Validada por ti. ':''}Cuenta como recuerdo sin ayuda.</p></div>`
+    :`<div class="fb bad"><div class="fb-head">${ic('bad')} Escribiste «${esc(FC.typed)}»</div><p class="small">La respuesta es <b>${esc(m==='ctx'?formOf(w.ex[1][0]):w.w)}</b>. La tarjeta volverá en esta sesión.</p><button class="btn ghost sm" data-act="fcOverride" style="justify-self:start">Mi respuesta también es válida</button></div>`;
+  else if(FC.typed) msg=`<div class="note">Tu respuesta: «${esc(FC.typed)}». Compárala con el significado de la tarjeta y valora con honestidad.</div>`;
+  else if(skip) msg=`<div class="note">Sin problema: lee la tarjeta con calma. Volverá en unos minutos.</div>`;
+  const wrongTyped=FC.chk&&!FC.chk.ok;
+  const rates=(skip||wrongTyped)?FC_RATES.slice(0,1):FC_RATES;
+  $('#fcCtl').innerHTML=`${msg}
+    <p class="small muted" style="text-align:center">${rates.length>1?'¿Cuánto te costó recordarla? (teclas 1–4)':'Pulsa para continuar (tecla 1)'}</p>
+    <div class="rate" ${rates.length===1?'style="grid-template-columns:1fr;max-width:320px;margin:0 auto;width:100%"':''}>${rates.map(([r,l,d],i)=>`<button class="${r}" data-act="fcRate" data-r="${r}" data-n="${i+1}"><span>${l}</span><small>${d} · ${fcPreview(it.id,r,recallType)}</small></button>`).join('')}</div>`;
+  $('#fcCtl').scrollIntoView({block:'nearest',behavior:'smooth'});
+}
+function fcRate(r){
+  if(!FC||!FC.flip) return;
+  const it=FC.q[FC.i], ok=r!=='again';
+  const typedType=FC.chk?(it.mode==='es'?'recall':'fill'):null;
+  const type=typedType&&(ok?FC.chk.ok:true)?typedType:'flash';
+  record(it.id,type,ok,{weak:r==='hard',easy:r==='easy'});
+  if(it.reps===0&&!(it.id in FC.first)) FC.first[it.id]=ok;
+  FC.res.push({id:it.id,mode:it.mode,r,rep:it.reps,type});
+  if(!ok&&it.reps<3) FC.q.splice(Math.min(FC.q.length,FC.i+4),0,{id:it.id,mode:it.mode,reps:it.reps+1});
+  else if(ok&&it.isNew&&it.reps===0&&FC.mode!=='en') FC.q.splice(Math.min(FC.q.length,FC.i+5),0,{id:it.id,mode:FC.mode==='ctx'?'ctx':'es',reps:1});
+  FC.i++; FC.flip=false; FC.chk=null; FC.typed='';
+  renderFC(); window.scrollTo({top:0,behavior:'smooth'});
+}
+function renderFCEnd(){
+  const ids=Object.keys(FC.first), known=ids.filter(id=>FC.first[id]), missed=ids.filter(id=>!FC.first[id]);
+  const pct=ids.length?Math.round(known.length/ids.length*100):0;
+  const byMode={}; FC.res.filter(x=>x.rep===0).forEach(x=>{const m=byMode[x.mode]||(byMode[x.mode]={n:0,ok:0});m.n++;if(x.r!=='again')m.ok++});
+  const recalls=FC.res.filter(x=>x.type!=='flash'&&x.r!=='again').length;
+  const ups=ids.filter(id=>level(id)>FC.before[id]);
+  if(!FC.logged){FC.logged=true;(S.fcLog||(S.fcLog=[])).push({t:Date.now(),mode:FC.mode,n:ids.length,known:known.length});if(S.fcLog.length>20)S.fcLog.shift();save()}
+  const enR=byMode.en&&byMode.en.n?byMode.en.ok/byMode.en.n:null, esR=byMode.es&&byMode.es.n?byMode.es.ok/byMode.es.n:null;
+  const advice=esR!==null&&enR!==null&&esR<enR?'Recordar desde el español te cuesta más que reconocer desde el inglés. Es normal: es la habilidad que necesitas para hablar, así que conviene practicarla más.'
+    :FC.mode==='en'?'Cuando reconozcas la mayoría, pasa a «Español → inglés» y escribe tus respuestas: así la palabra pasa de reconocerse a recordarse.'
+    :pct>=85?'Buen ritmo. Para dominar estas palabras del todo, úsalas en frases propias en la sección Practicar.':'Las que fallaste ya están en tu repaso. Volver a verlas en unas horas o mañana es más eficaz que repetirlas muchas veces hoy.';
+  $('#view').innerHTML=`<section class="card stack fade-in">
+    <div class="row" style="gap:20px">
+      <div class="ring" style="background:conic-gradient(var(--ok) ${pct*3.6}deg, var(--line) 0)"><b class="num">${pct}%</b></div>
+      <div class="stack" style="flex:1;min-width:220px"><p class="eyebrow">Flashcards · resumen</p><h1>${pct>=85?'Las recuerdas muy bien':pct>=60?'Buen avance':'Ya sabes cuáles reforzar'}</h1>
+      <p class="muted">Recordaste ${known.length} de ${ids.length} tarjetas a la primera.${recalls?` ${recalls} respuesta${recalls>1?'s escritas cuentan':' escrita cuenta'} como recuerdo sin ayuda.`:''}${ups.length?` ${ups.length} palabra${ups.length>1?'s subieron':' subió'} de nivel.`:''}</p></div>
+    </div>
+    <p class="note">${esc(advice)}</p>
+  </section>
+  <section class="grid-2">
+    <div class="card stack"><h3>Te costaron</h3>${missed.length?`<div class="wl">${missed.map(id=>`<div><button data-act="openWord" data-id="${id}">${esc(BY[id].w)}</button><span class="small muted">${esc(BY[id].es)}</span></div>`).join('')}</div>`:'<p class="empty">Ninguna: todas a la primera.</p>'}</div>
+    <div class="card stack"><h3>Por dirección</h3>${Object.entries(byMode).map(([m,v])=>hbar(FC_MODES[m].n,v.ok,v.n)).join('')}</div>
+  </section>
+  <div class="row">${missed.length?`<button class="btn primary" data-act="fcRedo" data-ids="${missed.join(',')}">Repetir las que me costaron</button><button class="btn" data-act="drill" data-ids="${missed.join(',')}">Practicarlas con ejercicios</button>`:''}<button class="btn ${missed.length?'ghost':'primary'}" data-act="fcNew">Nuevo mazo</button><button class="btn ghost" data-act="go" data-v="home">Volver al inicio</button></div>`;
+}
+
 /* ---------- Progreso ---------- */
 function hbar(label,ok,n){const pct=n?Math.round(ok/n*100):0;return `<div class="hbar"><span>${esc(label)}</span><span class="track"><i style="width:${pct}%;background:${pct>=80?'var(--ok)':pct>=50?'var(--accent)':'var(--bad)'}"></i></span><span class="v">${n?pct+'%':'—'} <small>(${ok}/${n})</small></span></div>`}
 function viewProgress(){
@@ -1202,11 +1399,27 @@ const ACT={
  revealSec:b=>{const o=LIB.open[b.dataset.id]||(LIB.open[b.dataset.id]={});o[b.dataset.k]=1;P(b.dataset.id).seen=1;save();refreshDetail()},
  revealAll:b=>{LIB.open[b.dataset.id]={es:1,simple:1,ctx:1,ex:1,col:1,syn:1,err:1,hook:1};P(b.dataset.id).seen=1;save();refreshDetail()},
  copyCode:()=>{const code=encode();const out=$('#codeOut');out.innerHTML=`<div class="code" id="codeBox" tabindex="0">${esc(code)}</div>`;const sel=()=>{const r=document.createRange();r.selectNodeContents($('#codeBox'));const s=getSelection();s.removeAllRanges();s.addRange(r)};try{navigator.clipboard.writeText(code).then(()=>toast('Código copiado.'),()=>{sel();toast('Selecciona y copia el código manualmente.')})}catch(e){sel();toast('Selecciona y copia el código manualmente.')}},
+ fcSet:b=>{const c=FCP(),k=b.dataset.k,v=b.dataset.v;c[k]=k==='st'||k==='size'?+v:v;save();render()},
+ fcStart:()=>fcStart(),
+ fcFlip:b=>fcFlip(!!b.dataset.skip),
+ fcRate:b=>fcRate(b.dataset.r),
+ fcOverride:()=>{FC.chk={ok:true,manual:true};fcControls()},
+ fcRedo:b=>{const c=FCP();fcStart(b.dataset.ids.split(',').filter(id=>BY[id]),c.mode)},
+ fcNew:()=>{FC=null;render();window.scrollTo({top:0})},
+ fcExit:()=>{FC=null;render();window.scrollTo({top:0})},
  restore:()=>{try{S=decode($('#restore').value);save();if(store.ref)pushCloud();toast('Progreso restaurado.');render()}catch(e){toast('El código no es válido. Cópialo completo e inténtalo de nuevo.')}},
  reset:b=>{if(b.dataset.armed){S=fresh();save();if(store.ref)pushCloud();toast('Progreso reiniciado.');render()}else{b.dataset.armed=1;b.textContent='Pulsa otra vez para confirmar';b.classList.remove('ghost');b.style.color='var(--bad)';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='Reiniciar todo el progreso';b.classList.add('ghost');b.style.color=''}},4000)}}
 };
 document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=ACT[b.dataset.act];if(f){e.preventDefault();f(b,e)}});
+document.addEventListener('change',e=>{if(e.target.id==='fcType'){FCP().type=e.target.checked;save()}});
 document.addEventListener('keydown',e=>{
+  if(VIEW==='flash'&&FC&&FC.i<FC.q.length){
+    if(e.target.matches('input,textarea,summary')) return;
+    if((e.key===' '||e.key==='Enter')&&!FC.flip&&!e.target.matches('button')){e.preventDefault();fcFlip();return}
+    if(e.key===' '&&!FC.flip){e.preventDefault();fcFlip();return}
+    if(FC.flip&&/^[1-4]$/.test(e.key)){const b=$(`[data-act="fcRate"][data-n="${e.key}"]`);if(b){e.preventDefault();b.click()}}
+    return;
+  }
   if(!SES||!CUR||e.target.matches('input,textarea')) return;
   if(e.key==='Enter'&&CUR.done){e.preventDefault();next();return}
   if(/^[1-4]$/.test(e.key)&&!CUR.done){const b=$$('.opt')[+e.key-1];if(b){b.click()}}
